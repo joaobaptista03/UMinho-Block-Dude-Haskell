@@ -25,9 +25,21 @@ repetido [_] = False
 repetido  ((a1,b1):t) | elem' b1 t = True
                       | otherwise = repetido t
 
+--Conta quantas portas existem na lista (Mapa) dada.
+quantasPortas :: [(Peca, Coordenadas)] -> Int
+quantasPortas [] = 0
+quantasPortas [(a1,b1)] | a1 == Porta = 1
+                        | otherwise = 0
+quantasPortas ((a1,b1):t) | a1 == Porta = 1 + quantasPortas t
+                          | otherwise = quantasPortas t
+
+so1Porta :: [(Peca, Coordenadas)] -> Bool
+so1Porta ((a1,b1):t) | quantasPortas ((a1,b1):t) == 1 = True
+                     | otherwise = False
+
 --Testa a validade do mapa pelos pontos 1 a 5 da Tarefa 1.
 validaPotencialMapa :: [(Peca, Coordenadas)] -> Bool
 validaPotencialMapa [] = True
 validaPotencialMapa [(a1,b1)] = True
-validaPotencialMapa ((a1,b1):t) | repetido ((a1,b1):t) = False 
-                                | otherwise = True
+validaPotencialMapa ((a1,b1):t) | repetido ((a1,b1):t) == False && so1Porta ((a1,b1):t) == True = True
+                                | otherwise = False
