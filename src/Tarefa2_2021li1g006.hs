@@ -58,7 +58,11 @@ pecas :: [(Peca, Coordenadas)] -> [Peca]
 pecas [] = []
 pecas ((p, (x,y)) : t) = p : pecas t
 
--- Finalmente, a função que, juntando todas, constrói o mapa (Importada a função listay da Tarefa 1).
+-- |Finalmente, a função que, juntando todas, constrói o mapa (Importada a função listay da Tarefa 1).
+
+-- |Por exemplo:
+
+-- |constroiMapa  [(Porta,(0,0)),(Bloco,(4,2)),(Bloco,(2,2)),(Bloco,(1,3)),(Bloco,(5,2)),(Bloco,(1,2)),(Bloco,(1,1)),(Caixa,(3,2))] = [[Porta],[Bloco],[Bloco,Bloco,Caixa,Bloco,Bloco],[Bloco]]
 constroiMapa :: [(Peca, Coordenadas)] -> Mapa
 constroiMapa [] = []
 constroiMapa ((p, (x,y)) : t) = let miny = minimum (listay ((p, (x,y)) : t)) in

@@ -225,7 +225,11 @@ validoChao l = let (Bloco,(x,y)) = maxfunc(func l) in
     else False
 
 
--- |Testa a validade do mapa pelos pontos 1 a 5 da Tarefa 1 (com a adição da função evalidaPorta).
+-- |Testa a validade do mapa pelos pontos 1 a 5 da Tarefa 1.
+
+-- |Por exemplo:
+
+-- |validaPotencialMapa [(Porta, (0,0)), (Bloco,(0,5)),(Bloco,(1,5)),(Bloco,(2,5)),(Bloco,(3,5)),(Bloco,(0,4)),(Caixa,(1,4)),(Caixa,(2,4)),(Caixa,(3,4)),(Caixa,(0,3))] = True
 validaPotencialMapa :: [(Peca, Coordenadas)] -> Bool
 validaPotencialMapa [] = False
 validaPotencialMapa [(p,cs)] = True
