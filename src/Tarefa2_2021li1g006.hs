@@ -33,10 +33,18 @@ listaslinha c [] = []
 listaslinha c ((p, (x,y)) : t) | c == y = listaslinha c t
                                 | otherwise = (p, (x,y)) : (listaslinha c t)
 
+-- |Cria uma lista da lista (Mapa) dada, sem a coluna c.
+
+-- |Por exemplo:
+
+-- |constroiPecas 1 [(Porta,(0,0)),(Bloco,(1,2)),(Bloco,(2,2)),(Caixa,(2,1))] = [Caixa]
+
+-- |constroiPecas 2 [(Porta,(0,0)),(Bloco,(1,2)),(Bloco,(2,2)),(Caixa,(2,1))] = [Bloco,Bloco]
 constroiPecas :: Int -> [(Peca, Coordenadas)] -> [Peca]
 constroiPecas y [] = []
 constroiPecas y ((p,(x,y2)):t) = if y == y2 then p : constroiPecas y t else constroiPecas y t
 
+-- Finalmente, a função que, juntando todas, constrói o mapa.
 constroiMapa :: [(Peca, Coordenadas)] -> Mapa
 constroiMapa [] = []
 constroiMapa ((p, (x,y)) : t) = let miny = minimum (listay ((p, (x,y)) : t)) in
