@@ -11,7 +11,7 @@ module Tarefa2_2021li1g006 where
 import LI12122
 import Tarefa1_2021li1g006
 
--- |Cria uma lista da lista (Mapa) dada, sem a coluna c.
+-- |Cria uma lista da lista dada, sem a coluna c.
 
 -- |Por exemplo:
 
@@ -21,7 +21,7 @@ import Tarefa1_2021li1g006
 listaslinha :: Int -> [(Peca, Coordenadas)] -> [(Peca, Coordenadas)]
 listaslinha c [] = []
 listaslinha c ((p, (x,y)) : t) | c == y = listaslinha c t
-                                | otherwise = (p, (x,y)) : listaslinha c t
+                               | otherwise = (p, (x,y)) : listaslinha c t
 
 -- |Cria uma lista da lista (Mapa) dada, sem a coluna c.
 
@@ -67,3 +67,15 @@ constroiMapa :: [(Peca, Coordenadas)] -> Mapa
 constroiMapa [] = []
 constroiMapa ((p, (x,y)) : t) = let miny = minimum (listay ((p, (x,y)) : t)) in
    pecas(constroiPecas miny ((p, (x,y)) : t)) : constroiMapa (listaslinha miny ((p, (x,y)) : t))
+
+-- |Cria uma lista da coluna c, a partir da lista dada.
+
+-- |Por exemplo:
+
+-- |listaslinha 1 [(Porta,(0,0)),(Bloco,(1,2)),(Bloco,(2,2)),(Caixa,(2,1))] = [(Porta,(0,0)),(Bloco,(1,2)),(Bloco,(2,2))]
+
+-- |listaslinha 2 [(Porta,(0,0)),(Bloco,(1,2)),(Bloco,(2,2)),(Caixa,(2,1))] = [(Porta,(0,0)),(Caixa,(2,1))]
+listalinha :: Int -> [(Peca, Coordenadas)] -> [(Peca, Coordenadas)]
+listalinha c [] = []
+listalinha c ((p, (x,y)) : t) | c == y = (p, (x,y)) : listaslinha c t
+                              | otherwise = listaslinha c t
