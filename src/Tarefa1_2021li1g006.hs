@@ -127,11 +127,23 @@ listax :: [(Peca, Coordenadas)] -> [Int]
 listax [] = []
 listax ((p, (x,y)) : t) = x : listax t
 
+-- |Cria uma lista da lista (Mapa) dada, sem a coluna c.
+
+-- |Por exemplo:
+
+-- |listascoluna 2 [(Porta,(0,0)),(Bloco,(1,2)),(Bloco,(2,2)),(Caixa,(2,1))] = [(Porta,(0,0)),(Bloco,(1,2))]
+
+-- |listascoluna 1 [(Porta,(0,0)),(Bloco,(1,2)),(Bloco,(2,2)),(Caixa,(2,1))] = [(Porta,(0,0)),(Bloco,(2,2)),(Caixa,(2,1))]
 listascoluna :: Int -> [(Peca, Coordenadas)] -> [(Peca, Coordenadas)]
 listascoluna c [] = []
 listascoluna c ((p, (x,y)) : t) | c == x = listascoluna c t
                                 | otherwise = (p, (x,y)) : (listascoluna c t)
 
+-- |Cria uma lista da lista (Mapa) dada, sem a coluna c.
+
+-- |Por exemplo:
+
+-- |listaBlocos [(Porta,(0,0)),(Bloco,(1,2)),(Bloco,(2,2)),(Caixa,(2,1))] = [(Bloco,(1,2)),(Bloco,(2,2))]
 listaBlocos :: [(Peca, Coordenadas)] -> [(Peca, Coordenadas)]
 listaBlocos [] = []
 listaBlocos ((p, (x,y)) : t) | p == Bloco = ((p, (x,y)) : listaBlocos t)
@@ -201,11 +213,15 @@ deletePeca p (h:t) | elem p (h:t) = if p == h then t else h : deletePeca p t
                    | otherwise = h:t
 
 -- |Finalmente, valida o chão. (são necessárias as condições das ll. 218/219 pois a Porta fazia conflito com a função!)
+
+-- |Por exemplo:
+
+-- |validoChao (Porta, (0,0)), (Bloco,(0,5)),(Bloco,(1,5)),(Bloco,(2,5)),(Bloco,(3,5)),(Caixa,(0,4)),(Caixa,(1,4)),(Caixa,(2,4)),(Caixa,(3,4))] = True
 validoChao :: [(Peca, Coordenadas)] -> Bool
 validoChao [(Bloco,(0,y))] = True
 validoChao l = let (Bloco,(x,y)) = maxfunc(func l) in
-    if filter (/=0) (listax l) == [] then True else
-    if elem (Bloco,(x-1,y)) (listaBlocos l) || elem (Bloco,(x-1,y+1)) (listaBlocos l) || elem (Bloco,(x-1,y-1)) (listaBlocos l) then validoChao (listascoluna x (listaBlocos l))
+    if filter (/=0) (listax l) == [] then True
+    else if elem (Bloco,(x-1,y)) (listaBlocos l) || elem (Bloco,(x-1,y+1)) (listaBlocos l) || elem (Bloco,(x-1,y-1)) (listaBlocos l) then validoChao (listascoluna x (listaBlocos l))
     else False
 
 
