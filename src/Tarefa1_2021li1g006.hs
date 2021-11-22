@@ -12,7 +12,7 @@ import LI12122
 
 --Tarefa 1 (2.1)
 
--- |Testa se as coordenadas "c" aparecem alguma vez no resto da lista (Mapa) dada.
+-- |Testa se as coordenadas "c" aparecem alguma vez no resto da lista dada.
 
 -- |Por exemplo:
 
@@ -24,7 +24,7 @@ elem' c [] = False
 elem' c ((p,cs):t) | c == cs = True
                    | otherwise = elem' c t
 
--- |Testa, usando a função elem', se existe alguma coordenada repetida na lista (Mapa) dada.
+-- |Testa, usando a função elem', se existe alguma coordenada repetida na lista dada.
 
 -- |Por exemplo:
 
@@ -37,7 +37,7 @@ repetido [_] = False
 repetido  ((p,cs):t) | elem' cs t = True
                      | otherwise = repetido t
 
--- |Conta quantas portas existem na lista (Mapa) dada.
+-- |Conta quantas portas existem na lista dada.
 
 -- |Por exemplo:
 
@@ -49,7 +49,7 @@ quantasPortas [] = 0
 quantasPortas ((p,cs):t) | p == Porta = 1 + quantasPortas t
                          | otherwise = quantasPortas t
 
--- |Dada uma lista (Mapa), retorna o primeiro conjunto (Porta, Coordenadas).
+-- |Dada uma lista, retorna o primeiro conjunto (Porta, Coordenadas).
 
 -- |Por exemplo:
 
@@ -60,7 +60,7 @@ saberPorta :: [(Peca, Coordenadas)] -> (Peca, Coordenadas)
 saberPorta ((p,(x,y)):t) | p == Porta = (p,(x,y))
                          | otherwise = saberPorta t
 
--- |Verifica, usando a função quantasPortas, se apenas existe 1 porta na lista (Mapa) dada.
+-- |Verifica, usando a função quantasPortas, se apenas existe 1 porta na lista dada.
 
 -- |Por exemplo:
 
@@ -70,7 +70,7 @@ saberPorta ((p,(x,y)):t) | p == Porta = (p,(x,y))
 so1Porta :: [(Peca, Coordenadas)] -> Bool
 so1Porta ((p,cs):t) = quantasPortas ((p,cs):t) == 1
 
--- |Dada uma lista (Mapa), produz uma outra lista com todas as caixas da mesma.
+-- |Dada uma lista, produz uma outra lista com todas as caixas da mesma.
 
 -- |Por exemplo:
 
@@ -94,7 +94,7 @@ testaCaixa [] (Caixa,(x,y)) = False
 testaCaixa ((p,(x2,y2)):t) (Caixa,(x,y)) | (p == Caixa || p == Bloco) && x == x2 && y+1 == y2 = True
                                          | otherwise = testaCaixa t (Caixa,(x,y))
 
--- |Dada uma lista (Mapa), testa todas as caixas usando as funções testaCaixa e listaCaixas, usando "all" para verificar se todas as caixas são válidas.
+-- |Dada uma lista, testa todas as caixas usando as funções testaCaixa e listaCaixas, usando "all" para verificar se todas as caixas são válidas.
 
 -- |Por exemplo:
 
@@ -105,7 +105,7 @@ verificaCaixas :: [(Peca, Coordenadas)] -> Bool
 verificaCaixas [] = True
 verificaCaixas ((p,cs):t) = all (testaCaixa ((p,cs):t)) (listaCaixas ((p,cs):t))
     
--- |Cria uma lista das coordenadas y da lista (Mapa) dada.
+-- |Cria uma lista das coordenadas y da lista dada.
 
 -- |Por exemplo:
 
@@ -116,7 +116,7 @@ listay :: [(Peca, Coordenadas)] -> [Int]
 listay [] = []
 listay ((p, (x,y)) : t) = y : listay t
 
--- |Cria uma lista das coordenadas x da lista (Mapa) dada.
+-- |Cria uma lista das coordenadas x da lista dada.
 
 -- |Por exemplo:
 
@@ -127,7 +127,7 @@ listax :: [(Peca, Coordenadas)] -> [Int]
 listax [] = []
 listax ((p, (x,y)) : t) = x : listax t
 
--- |Cria uma lista da lista (Mapa) dada, sem a coluna c.
+-- |Cria uma lista da lista dada, sem a coluna c.
 
 -- |Por exemplo:
 
@@ -139,7 +139,7 @@ listascoluna c [] = []
 listascoluna c ((p, (x,y)) : t) | c == x = listascoluna c t
                                 | otherwise = (p, (x,y)) : (listascoluna c t)
 
--- |Cria uma lista da lista (Mapa) dada, sem a coluna c.
+-- |Cria uma lista da lista dada, sem a coluna c.
 
 -- |Por exemplo:
 
@@ -174,7 +174,7 @@ maxfunc ((p,(x,y)):t) = let maxy = maximum (listay ((p,(x,y)):t)) in
     if y == maxy && p == Bloco then (p,(x,y))
     else maxfunc t
 
--- |Dada uma lista (mapa), produz outra lista com os elementos da mesma coluna do primeiro elemento seguidos na lista.
+-- |Dada uma lista, produz outra lista com os elementos da mesma coluna do primeiro elemento seguidos na lista.
 
 -- |Por exemplo:
 
@@ -187,7 +187,7 @@ func' [(p,(x,y))] = [(p,(x,y))]
 func' ((p,(x,y)):(p2,(x2,y2)):t) | x == x2 = (p,(x,y)) : func' ((p2,(x2,y2)):t)
                                  | otherwise = [(p,(x,y))]
 
--- |Dada uma lista (mapa), produz outra lista de blocos com a coluna mais à direita do mapa, usando a func'.
+-- |Dada uma lista, produz outra lista de blocos com a coluna mais à direita do mapa, usando a func'.
 
 -- |Por exemplo:
 
@@ -200,7 +200,7 @@ func ((p,(x,y)):t) = func'( let maxx = maximum (listax ((p,(x,y)):t)) in
     if x == maxx && p == Bloco then (p,(x,y)) : func t
     else func t)
 
--- |Dada uma peça, remove (caso haja) a primeira vez que ela aparece na lista (Mapa) dada.
+-- |Dada uma peça, remove (caso haja) a primeira vez que ela aparece na lista dada.
 
 -- |Por exemplo:
 
@@ -216,7 +216,7 @@ deletePeca p (h:t) | elem p (h:t) = if p == h then t else h : deletePeca p t
 
 -- |Por exemplo:
 
--- |validoChao (Porta, (0,0)), (Bloco,(0,5)),(Bloco,(1,5)),(Bloco,(2,5)),(Bloco,(3,5)),(Caixa,(0,4)),(Caixa,(1,4)),(Caixa,(2,4)),(Caixa,(3,4))] = True
+-- |validoChao [(Porta, (0,0)), (Bloco,(0,5)),(Bloco,(1,5)),(Bloco,(2,5)),(Bloco,(3,5)),(Caixa,(0,4)),(Caixa,(1,4)),(Caixa,(2,4)),(Caixa,(3,4))] = True
 validoChao :: [(Peca, Coordenadas)] -> Bool
 validoChao [(Bloco,(0,y))] = True
 validoChao l = let (Bloco,(x,y)) = maxfunc(func l) in

@@ -8,11 +8,8 @@ import Fixtures
 
 testsT2 =
   test
-    [ "Tarefa 2 - Teste Construir Mapa m1" ~: m1r ~=? constroiMapa m1
-    , "Tarefa 2 - Teste Construir Mapa vazio" ~: [] ~=? constroiMapa []
-    , "Tarefa 2 - Teste Desconstruir Mapa m1" ~: sort m1 ~=?  sort (desconstroiMapa m1r)
-    , "Tarefa 2 - Teste Desconstruir Mapa vazio" ~: [] ~=? desconstroiMapa []
-    , "Tarefa 2 - Teste Identidade m1" ~: sort m1 ~=?  sort (desconstroiMapa (constroiMapa m1))
-    , "Tarefa 2 - Teste Identidade m1r" ~: m1r ~=?  constroiMapa (desconstroiMapa m1r)
-    , "Tarefa 2 - Teste Construir Sobrepor Peças" ~: constroiMapa [(Porta, (7, 4))] ~=?  constroiMapa [(Porta, (7, 4)), (Porta, (7, 4))]
+    [ "Tarefa 2 - Teste Construir Mapa 1" ~: pecas [(Bloco,(4,1)),(Bloco,(2,1)),(Bloco,(5,1)),(Bloco,(1,1)),(Caixa,(3,1))] ~=? [Bloco,Bloco,Bloco,Bloco,Caixa]
+    , "Tarefa 2 - Teste Construir Mapa 2" ~: listaslinha 2 [(Porta,(0,0)),(Bloco,(1,2)),(Bloco,(2,2)),(Caixa,(2,1))] ~=? [(Porta,(0,0)),(Caixa,(2,1))]
+    , "Tarefa 2 - Teste Construir Mapa 3" ~: ordPecasx [(Bloco,(4,2)),(Bloco,(2,2)),(Bloco,(5,2)),(Bloco,(1,2)),(Caixa,(3,2))] ~=? [(Bloco,(1,2)),(Bloco,(2,2)),(Caixa,(3,2)),(Bloco,(4,2)),(Bloco,(5,2))]
+    , "Tarefa 2 - Teste Construir Mapa 4 (Não acabado)" ~: constroiMapa  [(Porta,(0,0)),(Bloco,(4,2)),(Bloco,(2,2)),(Bloco,(1,3)),(Bloco,(5,2)),(Bloco,(1,2)),(Bloco,(1,1)),(Caixa,(3,2))] ~=? [[Porta],[Bloco],[Bloco,Bloco,Caixa,Bloco,Bloco],[Bloco]]
     ]
