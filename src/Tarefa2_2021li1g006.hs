@@ -59,13 +59,13 @@ pecas [] = []
 pecas ((p, (x,y)) : t) = p : pecas t
 
 
--- |Dado um inteiro a (que irá ser 0 na função constroiMapa), 
+-- |Dado um inteiro a (que irá ser 0 na função constroiMapa), coloca um ou vários "Vazio" antes de um bloco, se assim for necessário.
 
 -- |Por exemplo:
 
--- |pecas' = 
+-- |pecas' 0 [(Bloco,(2,0))] = [Vazio,Vazio,Bloco]
 
--- |pecas' = 
+-- |pecas' 0 [(Bloco,(2,0)),(Bloco,(5,0))] = [Vazio,Vazio,Bloco,Vazio,Vazio,Bloco]
 pecas' :: Int -> [(Peca, Coordenadas)] -> [Peca]
 pecas' a [] = []
 pecas' a ((p, (x,y)) : t) | x == a = p : pecas' (a+1) t
