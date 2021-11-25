@@ -33,8 +33,8 @@ listaslinha c ((p, (x,y)) : t) | c == y = listaslinha c t
 constroiPecas :: Int -> [(Peca, Coordenadas)] -> [(Peca, Coordenadas)]
 constroiPecas y [] = []
 constroiPecas y ((p,(x,y2)):t) = ordPecasx (if y == y2 then (p,(x,y2)) : constroiPecas y t else constroiPecas y t)
-
--- |Dada uma lista, ordena as peças por ordem crescente do argumento x (Importada a função listax da Tarefa 1).
+                    
+-- |Dada uma lista, ordena as peças por ordem crescente da coordenada x (Importada a função listax da Tarefa 1).
 
 -- |Por exemplo:
 
@@ -51,12 +51,36 @@ ordPecasx ((p, (x,y)): t) = let minx = minimum (listax ((p, (x,y)) : t)) in
 
 -- |Por exemplo:
 
--- |pecas [(Bloco,(4,2)),(Bloco,(2,2)),(Bloco,(5,2)),(Bloco,(1,2)),(Caixa,(3,2))] = [Bloco,Bloco,Bloco,Bloco,Bloco]
+-- |pecas [(Bloco,(4,2)),(Bloco,(2,2)),(Bloco,(5,2)),(Bloco,(1,2)),(Caixa,(3,2))] = [Bloco,Bloco,Bloco,Bloco,Caixa]
 
--- |pecas [(Bloco,(4,1)),(Bloco,(2,1)),(Bloco,(5,1)),(Bloco,(1,1)),(Caixa,(3,1))] = [Bloco,Bloco,Bloco,Bloco,Caixa]
+-- |pecas [(Bloco,(4,1)),(Bloco,(2,1)),(Bloco,(5,1)),(Caixa,(1,1)),(Caixa,(3,1))] = [Bloco,Bloco,Bloco,Caixa,Caixa]
 pecas :: [(Peca, Coordenadas)] -> [Peca]
 pecas [] = []
 pecas ((p, (x,y)) : t) = p : pecas t
+
+
+-- |Dado um inteiro a (que irá ser 0 na função constroiMapa), 
+
+-- |Por exemplo:
+
+-- |pecas' = 
+
+-- |pecas' = 
+pecas' :: Int -> [(Peca, Coordenadas)] -> [Peca]
+pecas' a [] = []
+pecas' a ((p, (x,y)) : t) | x == a = p : pecas' (a+1) t
+                          | otherwise = Vazio : pecas' (a+1) ((p, (x,y)) : t)
+
+-- |Dada uma lista de peças e um número inteiro a (que irá ser o x da peça mais à direita do mapa, na constroiMapa), adiciona os vazios que faltam à frente da última peça não vazia.
+
+-- |Por exemplo:
+
+-- |vaziosd 6 [Bloco,Bloco] = [Bloco,Bloco,Vazio,Vazio,Vazio,Vazio,Vazio]
+
+-- |vaziosd 4 [Caixa,Bloco] = [Caixa,Bloco,Vazio,Vazio,Vazio]
+vaziosd :: Int -> [Peca] -> [Peca]
+vaziosd a ps | a+1 > length ps = vaziosd a (ps ++ [Vazio])
+             | otherwise = ps
 
 -- |Finalmente, a função que, juntando todas, constrói o mapa (Importada a função listay da Tarefa 1).
 
@@ -65,8 +89,10 @@ pecas ((p, (x,y)) : t) = p : pecas t
 -- |constroiMapa  [(Porta,(0,0)),(Bloco,(4,2)),(Bloco,(2,2)),(Bloco,(1,3)),(Bloco,(5,2)),(Bloco,(1,2)),(Bloco,(1,1)),(Caixa,(3,2))] = [[Porta],[Bloco],[Bloco,Bloco,Caixa,Bloco,Bloco],[Bloco]]
 constroiMapa :: [(Peca, Coordenadas)] -> Mapa
 constroiMapa [] = []
-constroiMapa ((p, (x,y)) : t) = let miny = minimum (listay ((p, (x,y)) : t)) in
-   pecas(constroiPecas miny ((p, (x,y)) : t)) : constroiMapa (listaslinha miny ((p, (x,y)) : t))
+constroiMapa ((p, (x,y)) : t) = let miny = minimum (listay ((p, (x,y)) : t))
+                                    maxy = maximum (listay ((p, (x,y)) : t))
+                                    maxx = head(listax [maxfunc(func ((p, (x,y)) : t))]) in
+                                        vaziosd maxx (pecas' 0 (constroiPecas miny ((p, (x,y)) : t))) : constroiMapa (listaslinha miny ((p, (x,y)) : t))
 
 -- |Cria uma lista da coluna c, a partir da lista dada.
 
