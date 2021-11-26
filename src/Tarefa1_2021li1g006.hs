@@ -232,5 +232,5 @@ validoChao l = let (Bloco,(x,y)) = maxfunc(func l) in
 -- |validaPotencialMapa [(Porta, (0,0)), (Bloco,(0,5)),(Bloco,(1,5)),(Bloco,(2,5)),(Bloco,(3,5)),(Bloco,(0,4)),(Caixa,(1,4)),(Caixa,(2,4)),(Caixa,(3,4)),(Caixa,(0,3))] = True
 validaPotencialMapa :: [(Peca, Coordenadas)] -> Bool
 validaPotencialMapa [] = False
-validaPotencialMapa [(p,cs)] = True
+validaPotencialMapa [(Bloco,cs)] = False
 validaPotencialMapa l = not (repetido l) && so1Porta l && verificaCaixas l && haespaco l && validoChao l
