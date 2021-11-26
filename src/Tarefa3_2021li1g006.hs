@@ -12,3 +12,14 @@ import LI12122
 
 instance Show Jogo where
   show = undefined
+
+
+
+
+type ShowS = String -> String
+class Show a where
+  showsPrec :: Int -> a -> ShowS
+  show :: a -> String
+  showList :: [a] -> ShowS
+
+

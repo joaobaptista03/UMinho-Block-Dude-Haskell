@@ -139,6 +139,29 @@ separaListas ((p,(x,y)):t) a = if a < length ((p,(x,y)):t)
                               then take ((maximum (listax ((p,(x,y)):t))) + 1) (drop a (pecas ((p,(x,y)):t))) : separaListas ((p,(x,y)):t) (a + (maximum (listax ((p,(x,y)):t))) + 1)
                               else []
 
+-- |Remove os pares (Peca, Coordenadas) vazios de uma lista.
+
+-- |Por exemplo:
+
+-- |tirarVazios [(Bloco,(0,0)),(Vazio,(1,0)),(Bloco,(0,0)),(Bloco,(1,0))] = [(Bloco,(0,0)),(Bloco,(0,0)),(Bloco,(1,0))]
+
+-- |tirarVazios [(Vazio,(0,0)),(Vazio,(1,0)),(Vazio,(0,0)),(Vazio,(1,0))] = []
+tirarVazios :: [(Peca, Coordenadas)] -> [(Peca, Coordenadas)]
+tirarVazios [] = []
+tirarVazios ((p,(x,y)):t) | p == Vazio = tirarVazios t
+                          | otherwise = (p,(x,y)) : tirarVazios t
+
+-- |Desconstrói apenas uma lista de peças para (Peca, Coordenadas), retirando os vazios com a função tirarVazios, dado os números a e b na função final desconstroiMapa.
+
+-- |Por exemplo:
+
+-- |desconstroiLista 0 1 [Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Bloco] = [(Bloco,(6,1))]
+
+-- |desconstroiLista 0 3 [Bloco, Vazio, Vazio, Bloco, Vazio, Vazio, Bloco] = [(Bloco,(0,3)),(Bloco,(3,3)),(Bloco,(6,3))]
+desconstroiLista :: Int -> Int -> [Peca] -> [(Peca, Coordenadas)]
+desconstroiLista _ _ [] = []
+desconstroiLista a b (h:t) = tirarVazios ((h,(a,b)) : desconstroiLista (a+1) b t)
+
 -- |Finalmente, a função final constroiMapa que "transforma" um conjunto de peças (não vazias e VÁLIDAS) em um mapa funcional com vazios, separado por linhas.
 
 -- |Por exemplo:
@@ -149,3 +172,14 @@ separaListas ((p,(x,y)):t) a = if a < length ((p,(x,y)):t)
 constroiMapa :: [(Peca, Coordenadas)] -> Mapa
 constroiMapa [] = []
 constroiMapa ((p,(x,y)):t) = if validaPotencialMapa ((p,(x,y)):t) then separaListas (listavazios ((p,(x,y)):t)) 0 else []
+
+-- |Finalmente, também, a função desconstroiMapa, que faz o contrário da constroiMapa (origina uma lista de (Peca, Coordenadas) a partir de um mapa.)
+
+-- |Por exemplo:
+
+-- |desconstroiMapa [[Vazio,Vazio,Vazio,Vazio],[Vazio,Vazio,Vazio,Vazio],[Vazio,Bloco,Vazio,Vazio],[Vazio,Vazio,Bloco,Vazio],[Vazio,Vazio,Vazio,Bloco]] = [(Bloco,(1,2)),(Bloco,(2,3)),(Bloco,(3,4))]
+
+-- |desconstroiMapa [[Vazio,Vazio,Vazio,Vazio],[Vazio,Vazio,Vazio,Vazio],[Vazio,Bloco,Vazio,Vazio],[Vazio,Vazio,Bloco,Bloco]] = [(Bloco,(1,2)),(Bloco,(2,3)),(Bloco,(3,3))]
+desconstroiMapa :: Mapa -> [(Peca, Coordenadas)]
+desconstroiMapa [] = []
+desconstroiMapa l = desconstroiMapa (init l) ++ desconstroiLista 0 (length l - 1) (last l)
