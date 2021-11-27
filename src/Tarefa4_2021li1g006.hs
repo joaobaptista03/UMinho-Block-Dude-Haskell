@@ -12,20 +12,43 @@ import LI12122
 import GHC.Stack.Types (CallStack(FreezeCallStack))
 
 moveJogador :: Jogo -> Movimento -> Jogo
-moveJogador jogo movimento = undefined
+moveJogador (Jogo m j) movimento = Jogo m (alteraJogador j movimento m)
 
 correrMovimentos :: Jogo -> [Movimento] -> Jogo
-correrMovimentos jogo movimentos = undefined
+correrMovimentos jogo [] = jogo
+correrMovimentos jogo (h:t) = correrMovimentos (moveJogador jogo h) t
 
--- A função faz com que o jogador faça um movimento
+-- Devolve o jogador na posição correta após efetuar o movimento
+alteraJogador :: Jogador -> Movimento -> Mapa -> Jogador 
+alteraJogador j AndarDireita m = andaDirJogador j m
+-- alteraJogador j AndarEsquerda m = andaEsqJogador j m
+-- alteraJogador j InterageCaixa m = interageCaixa j m
+-- alteraJogador j@(Jogador c dir b) Trepar m | dir == Este = trepaDir j m
+--                                            | otherwise = trepaEsq j m
 
-moveEnabled :: a -> Bool
-moveEnabled _ = False
+-- NOTA: confirmar que nao ha peças vazias quando y é 0
+-- NOTA2: adicionar caso quando é porta
+andaDirJogador :: Jogador -> Mapa -> Jogador
+andaDirJogador (Jogador (x,y) dir caixa) m 
+                    | getPeca m (x+1) y == Bloco || getPeca m (x+1) y == Caixa = (Jogador c Este caixa)
+                    | getPeca m (x+1) y == Vazio 
+                        | getPeca m (x+1) (y-1) == Bloco || getPeca m (x+1) (y-1) == Caixa = (Jogador (x+1,y) Este caixa)
+                        | otherwise = andaDirJogador (Jogador (x,y-1) Este caixa) m
 
-move :: Coordenadas -> Movimento -> (index,index) 
-move (x,y) AndaDireita = (x+1,y)
-move (x,y) AndaEsquerda = (x-1,y)
+-- andaEsq (fazer)
 
+-- trepa (fazer) -> TER EM CONSIDERAÇÃO A DIREÇÃO DO JOGADOR <-
+--     trepaDir
+--     trepaEsq
 
-moverp :: Jogador -> Movimento -> (index,index) -> Bool 
-moverp _ _ [] = False
+-- interageCaixa (fazer)
+
+-- Devolve o tipo de peca duma dada posicao no mapa
+getPeca :: Mapa -> Int -> Int -> Peca
+getPeca [l] x 0 = getLinha l x
+getPeca (h:t) x y = getPeca t x y-1
+
+-- Axuliar para a getPeca que devolve a peca de uma linha de acordo com uma coordenada x
+getLinha :: [Peca] -> Int -> Peca
+getLinha [p] 0 = p
+getLinha (h:t) x = getLinha t x-1
