@@ -30,9 +30,9 @@ alteraJogador j AndarDireita m = andaDirJogador j m
 -- NOTA2: adicionar caso quando é porta
 andaDirJogador :: Jogador -> Mapa -> Jogador
 andaDirJogador (Jogador (x,y) dir caixa) m 
-                    | getPeca m (x+1) y == Bloco || getPeca m (x+1) y == Caixa = (Jogador (x,y) Este caixa)
+                    | getPeca m (x+1) y == Bloco || getPeca m (x+1) y == Caixa = Jogador (x,y) Este caixa
                     | getPeca m (x+1) y == Vazio =
-                        if getPeca m (x+1) (y-1) == Bloco || getPeca m (x+1) (y-1) == Caixa then (Jogador (x+1,y) Este caixa)
+                        if getPeca m (x+1) (y-1) == Bloco || getPeca m (x+1) (y-1) == Caixa then Jogador (x+1,y) Este caixa
                         else andaDirJogador (Jogador (x,y-1) Este caixa) m
 
 -- andaEsq (fazer)
@@ -46,9 +46,9 @@ andaDirJogador (Jogador (x,y) dir caixa) m
 -- Devolve o tipo de peca duma dada posicao no mapa
 getPeca :: Mapa -> Int -> Int -> Peca
 getPeca [l] x 0 = getLinha l x
-getPeca (h:t) x y = getPeca t x y-1
+getPeca (h:t) x y = getPeca t x (y-1)
 
 -- Axuliar para a getPeca que devolve a peca de uma linha de acordo com uma coordenada x
 getLinha :: [Peca] -> Int -> Peca
 getLinha [p] 0 = p
-getLinha (h:t) x = getLinha t x-1
+getLinha (h:t) x = getLinha t (x-1)
