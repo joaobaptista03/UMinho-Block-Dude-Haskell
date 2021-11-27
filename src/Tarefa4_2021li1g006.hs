@@ -30,10 +30,10 @@ alteraJogador j AndarDireita m = andaDirJogador j m
 -- NOTA2: adicionar caso quando é porta
 andaDirJogador :: Jogador -> Mapa -> Jogador
 andaDirJogador (Jogador (x,y) dir caixa) m 
-                    | getPeca m (x+1) y == Bloco || getPeca m (x+1) y == Caixa = (Jogador c Este caixa)
-                    | getPeca m (x+1) y == Vazio 
-                        | getPeca m (x+1) (y-1) == Bloco || getPeca m (x+1) (y-1) == Caixa = (Jogador (x+1,y) Este caixa)
-                        | otherwise = andaDirJogador (Jogador (x,y-1) Este caixa) m
+                    | getPeca m (x+1) y == Bloco || getPeca m (x+1) y == Caixa = (Jogador (x,y) Este caixa)
+                    | getPeca m (x+1) y == Vazio =
+                        if getPeca m (x+1) (y-1) == Bloco || getPeca m (x+1) (y-1) == Caixa then (Jogador (x+1,y) Este caixa)
+                        else andaDirJogador (Jogador (x,y-1) Este caixa) m
 
 -- andaEsq (fazer)
 
