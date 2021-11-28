@@ -28,5 +28,22 @@ pecapchar (h:t) | h == Porta = "P" ++ pecapchar t
                 | h == Caixa = "C" ++ pecapchar t
                 | h == Vazio = " " ++ pecapchar t
 
+-- |Dado um Mapa, produz a sua representação em jogo, sendo "\n" um parágrafo.
+
+-- |Por exemplo:
+
+-- |mapapchar [[Porta,Vazio,Vazio,Vazio],[Vazio,Vazio,Vazio,Vazio],[Vazio,Vazio,Vazio,Vazio],[Caixa,Vazio,Vazio,Vazio],[Bloco,Caixa,Caixa,Caixa],[Bloco,Bloco,Bloco,Bloco]] =
+
+-- |"P   \n    \n    \nC   \nXCCC\nXXXX\n"
+
+-- |
+
+-- |mapapchar [[Porta,Bloco,Bloco,Vazio],[Vazio,Vazio,Bloco,Vazio],[Vazio,Vazio,Vazio,Vazio],[Caixa,Vazio,Vazio,Vazio],[Bloco,Caixa,Caixa,Caixa],[Bloco,Bloco,Bloco,Bloco]] =
+
+-- |"PXX \n  X \n    \nC   \nXCCC\nXXXX\n"
+
+mapapchar :: Mapa -> String
+mapapchar [] = []
+mapapchar (h:t) = pecapchar h ++ "\n" ++ mapapchar t
 
 
