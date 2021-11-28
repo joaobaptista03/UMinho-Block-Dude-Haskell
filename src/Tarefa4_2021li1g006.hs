@@ -12,18 +12,21 @@ import LI12122
 import GHC.Stack.Types (CallStack(FreezeCallStack))
 import Language.Haskell.TH (javaScript)
 
+
+-- Aplica o efeito de um comando sobre o jogador
 moveJogador :: Jogo -> Movimento -> Jogo
 moveJogador (Jogo m j) AndarDireita = Jogo m (andaDirJogador j m)
 moveJogador (Jogo m j) AndarEsquerda = Jogo m (andaEsqJogador j m)
 moveJogador (Jogo m j) Trepar = Jogo m (trepa j m)
 moveJogador j InterageCaixa = interageCaixa j
 
-
+-- Aplica consecutivamente os comandos dados pela lista
 correrMovimentos :: Jogo -> [Movimento] -> Jogo
 correrMovimentos jogo [] = jogo
 correrMovimentos jogo (h:t) = correrMovimentos (moveJogador jogo h) t
 
 
+-- A função permite ao jogador trepar, se possível, o obstáculo à sua frente
 trepa :: Jogador -> Mapa -> Jogador 
 trepa j@(Jogador (x,y) dir caixa) m 
                      | not caixa && dir == Este && (getPeca m (x+1) y == Bloco || getPeca m (x+1) y == Caixa) && (getPeca m (x+1) (y+1) == Vazio || getPeca m (x+1) (y+1) == Porta) = Jogador (x+1,y+1) dir caixa
@@ -34,10 +37,10 @@ trepa j@(Jogador (x,y) dir caixa) m
                                                                                                                    && (getPeca m (x-1) (y+2) == Vazio || getPeca m (x-1) (y+2) == Porta) = Jogador (x-1,y+1) dir caixa
                      | otherwise = j
 
-
-
 -- NOTA: confirmar que nao ha peças vazias quando y é 0
 -- NOTA2: adicionar caso quando é porta
+
+-- Faz com que o jogador se volte para Este e avance, se for possível, uma unidade
 andaDirJogador :: Jogador -> Mapa -> Jogador
 andaDirJogador (Jogador (x,y) dir caixa) m 
              | getPeca m (x+1) y == Bloco || getPeca m (x+1) y == Caixa = Jogador (x,y) Este caixa
@@ -45,7 +48,7 @@ andaDirJogador (Jogador (x,y) dir caixa) m
                     if getPeca m (x+1) (y-1) == Bloco || getPeca m (x+1) (y-1) == Caixa then Jogador (x+1,y) Este caixa
                     else andaDirJogador (Jogador (x,y-1) Este caixa) m
 
-
+-- Faz com que o jogador se volte para Oeste e avance, se for possível, uma unidade
 andaEsqJogador :: Jogador -> Mapa -> Jogador 
 andaEsqJogador (Jogador (x,y) esq caixa) m 
              | getPeca m (x-1) y == Bloco || getPeca m (x-1) y == Caixa = Jogador (x,y) Oeste caixa
@@ -53,6 +56,8 @@ andaEsqJogador (Jogador (x,y) esq caixa) m
                     if getPeca m (x-1) (y-1) == Bloco || getPeca m (x-1) (y-1) == Caixa then Jogador (x-1,y) Oeste caixa
                     else andaEsqJogador (Jogador (x,y-1) Oeste caixa) m
 
+
+-- A função permite ao jogador carregar/largar uma caixa
 interageCaixa :: Jogo -> Jogo  
 interageCaixa jog@(Jogo m j@(Jogador (x,y) dir caixa)) | caixa && dir == Este && getPeca m (x+1) (y+1) == Vazio 
                                                                           && (getPeca m (x+1) y == Bloco || getPeca m (x+1) y == Caixa) = Jogo (setPeca m Caixa (x+1) (y+1)) (Jogador (x,y) dir False)
@@ -83,6 +88,7 @@ setPeca [] _ _ _ = []
 setPeca (h:t) p x 0 = setLinha h p x : t
 setPeca (h:t) p x y = h : setPeca t p x (y-1)
 
+-- Auxiliar da SetPeca que altera a peça de uma certa linha para o tipo de peça recebido como argumento, mantendo igual o resto da linha
 setLinha :: [Peca] -> Peca -> Int -> [Peca]
 setLinha [] _ _ = []
 setLinha (h:t) p 0 = p:t
