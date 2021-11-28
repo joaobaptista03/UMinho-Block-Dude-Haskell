@@ -14,12 +14,19 @@ instance Show Jogo where
   show = undefined
 
 
+-- |Dada uma lista de Peças (de uma certa linha y = a), produz uma String com a sua representação no jogo.
 
+-- |Por exemplo:
 
-type ShowS = String -> String
-class Show a where
-  showsPrec :: Int -> a -> ShowS
-  show :: a -> String
-  showList :: [a] -> ShowS
+-- |pecapchar [Porta,Vazio,Vazio,Bloco] = "P  X"
+
+-- |pecapchar [Bloco,Bloco,Bloco,Bloco] = "XXXX"
+pecapchar :: [Peca] -> String
+pecapchar [] = []
+pecapchar (h:t) | h == Porta = "P" ++ pecapchar t
+                | h == Bloco = "X" ++ pecapchar t
+                | h == Caixa = "C" ++ pecapchar t
+                | h == Vazio = " " ++ pecapchar t
+
 
 
