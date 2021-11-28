@@ -21,7 +21,7 @@ correrMovimentos jogo (h:t) = correrMovimentos (moveJogador jogo h) t
 -- Devolve o jogador na posição correta após efetuar o movimento
 alteraJogador :: Jogador -> Movimento -> Mapa -> Jogador 
 alteraJogador j AndarDireita m = andaDirJogador j m
--- alteraJogador j AndarEsquerda m = andaEsqJogador j m
+alteraJogador j AndarEsquerda m = andaEsqJogador j m
 -- alteraJogador j InterageCaixa m = interageCaixa j m
 -- alteraJogador j@(Jogador c dir b) Trepar m | dir == Este = trepaDir j m
 --                                            | otherwise = trepaEsq j m
@@ -30,12 +30,18 @@ alteraJogador j AndarDireita m = andaDirJogador j m
 -- NOTA2: adicionar caso quando é porta
 andaDirJogador :: Jogador -> Mapa -> Jogador
 andaDirJogador (Jogador (x,y) dir caixa) m 
-                    | getPeca m (x+1) y == Bloco || getPeca m (x+1) y == Caixa = Jogador (x,y) Este caixa
-                    | getPeca m (x+1) y == Vazio =
-                        if getPeca m (x+1) (y-1) == Bloco || getPeca m (x+1) (y-1) == Caixa then Jogador (x+1,y) Este caixa
-                        else andaDirJogador (Jogador (x,y-1) Este caixa) m
+             | getPeca m (x+1) y == Bloco || getPeca m (x+1) y == Caixa = Jogador (x,y) Este caixa
+             | getPeca m (x+1) y == Vazio =
+                    if getPeca m (x+1) (y-1) == Bloco || getPeca m (x+1) (y-1) == Caixa then Jogador (x+1,y) Este caixa
+                    else andaDirJogador (Jogador (x,y-1) Este caixa) m
 
--- andaEsq (fazer)
+
+andaEsqJogador :: Jogador -> Mapa -> Jogador 
+andaEsqJogador (Jogador (x,y) esq caixa) m 
+            | getPeca m (x-1) y == Bloco || getPeca m (x-1) y == Caixa = Jogador (x,y) Oeste caixa
+             | getPeca m (x-1) y == Vazio =
+                    if getPeca m (x-1) (y-1) == Bloco || getPeca m (x-1) (y-1) == Caixa then Jogador (x-1,y) Oeste caixa
+                    else andaEsqJogador (Jogador (x,y-1) Oeste caixa) m
 
 -- trepa (fazer) -> TER EM CONSIDERAÇÃO A DIREÇÃO DO JOGADOR <-
 --     trepaDir
