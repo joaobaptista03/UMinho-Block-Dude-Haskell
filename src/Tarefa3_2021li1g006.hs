@@ -11,39 +11,23 @@ module Tarefa3_2021li1g006 where
 import LI12122
 
 instance Show Jogo where
-  show = undefined
+  show = mostrar
 
 
--- |Dada uma lista de Peças (de uma certa linha y = a), produz uma String com a sua representação no jogo.
+-- |Esta função retorna a string "X" se a Peça for um Bloco, "C" se for Caixa, "P" se for uma porta, e " " se for Vazio.
+peca1 :: Peca -> String
+peca1 p | p == Bloco = "X"
+        | p == Caixa = "C"
+        | p == Porta = "P"
+        | p == Vazio = " "
 
--- |Por exemplo:
 
--- |pecapchar [Porta,Vazio,Vazio,Bloco] = "P  X"
+auxiliar :: String -> Coordenadas -> String
+auxiliar (h:t) (x,y) | x == 0 && y == 0 = 'C' : t
+                        | x > 1 && h == '/' = h : auxiliar t (x-1,y)
+                        | x > 1 && h == 'n' = h : auxiliar t (x,y)
+                        | x > 1 = h : auxiliar t (x,y)
 
--- |pecapchar [Bloco,Bloco,Bloco,Bloco] = "XXXX"
-pecapchar :: [Peca] -> String
-pecapchar [] = []
-pecapchar (h:t) | h == Porta = "P" ++ pecapchar t
-                | h == Bloco = "X" ++ pecapchar t
-                | h == Caixa = "C" ++ pecapchar t
-                | h == Vazio = " " ++ pecapchar t
-
--- |Dado um Mapa, produz a sua representação em jogo, sendo "\n" um parágrafo.
-
--- |Por exemplo:
-
--- |mapapchar [[Porta,Vazio,Vazio,Vazio],[Vazio,Vazio,Vazio,Vazio],[Vazio,Vazio,Vazio,Vazio],[Caixa,Vazio,Vazio,Vazio],[Bloco,Caixa,Caixa,Caixa],[Bloco,Bloco,Bloco,Bloco]] =
-
--- |"P   \n    \n    \nC   \nXCCC\nXXXX\n"
-
--- |
-
--- |mapapchar [[Porta,Bloco,Bloco,Vazio],[Vazio,Vazio,Bloco,Vazio],[Vazio,Vazio,Vazio,Vazio],[Caixa,Vazio,Vazio,Vazio],[Bloco,Caixa,Caixa,Caixa],[Bloco,Bloco,Bloco,Bloco]] =
-
--- |"PXX \n  X \n    \nC   \nXCCC\nXXXX\n"
-
-mapapchar :: Mapa -> String
-mapapchar [] = []
-mapapchar (h:t) = pecapchar h ++ "\n" ++ mapapchar t
-
+caixa :: Coordenadas -> Coordenadas 
+caixa (x,y) = (x,y-1)
 
