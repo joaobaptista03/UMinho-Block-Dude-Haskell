@@ -12,19 +12,17 @@ import LI12122
 import GHC.Stack.Types (CallStack(FreezeCallStack))
 
 moveJogador :: Jogo -> Movimento -> Jogo
-moveJogador (Jogo m j) movimento = Jogo m (alteraJogador j movimento m)
+moveJogador (Jogo m j) AndarDireita = Jogo m (andaDirJogador j m)
+moveJogador (Jogo m j) AndarEsquerda = Jogo m (andaEsqJogador j m)
+-- moveJogador (Jogo m j) InterageCaixa = 
+-- moveJogador (Jogo m j@(Jogador c dir b)) Trepar | dir == Este = trepaDir j m
+--                                                 | otherwise = trepaEsq j m
+
 
 correrMovimentos :: Jogo -> [Movimento] -> Jogo
 correrMovimentos jogo [] = jogo
 correrMovimentos jogo (h:t) = correrMovimentos (moveJogador jogo h) t
 
--- Devolve o jogador na posição correta após efetuar o movimento
-alteraJogador :: Jogador -> Movimento -> Mapa -> Jogador 
-alteraJogador j AndarDireita m = andaDirJogador j m
-alteraJogador j AndarEsquerda m = andaEsqJogador j m
--- alteraJogador j InterageCaixa m = interageCaixa j m
--- alteraJogador j@(Jogador c dir b) Trepar m | dir == Este = trepaDir j m
---                                            | otherwise = trepaEsq j m
 
 -- NOTA: confirmar que nao ha peças vazias quando y é 0
 -- NOTA2: adicionar caso quando é porta
@@ -38,7 +36,7 @@ andaDirJogador (Jogador (x,y) dir caixa) m
 
 andaEsqJogador :: Jogador -> Mapa -> Jogador 
 andaEsqJogador (Jogador (x,y) esq caixa) m 
-            | getPeca m (x-1) y == Bloco || getPeca m (x-1) y == Caixa = Jogador (x,y) Oeste caixa
+             | getPeca m (x-1) y == Bloco || getPeca m (x-1) y == Caixa = Jogador (x,y) Oeste caixa
              | getPeca m (x-1) y == Vazio =
                     if getPeca m (x-1) (y-1) == Bloco || getPeca m (x-1) (y-1) == Caixa then Jogador (x-1,y) Oeste caixa
                     else andaEsqJogador (Jogador (x,y-1) Oeste caixa) m
