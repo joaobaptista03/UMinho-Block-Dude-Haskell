@@ -17,9 +17,8 @@ import Language.Haskell.TH (javaScript)
 
 -- |Por exemplo:
 
--- |moveJogador
-
--- |moveJogador 
+-- |moveJogador m1e1 AndarEsquerda = Jogo m1r (Jogador (5, 3) Oeste False)
+ 
 moveJogador :: Jogo -> Movimento -> Jogo
 moveJogador (Jogo m j) AndarDireita = Jogo m (andaDirJogador j m)
 moveJogador (Jogo m j) AndarEsquerda = Jogo m (andaEsqJogador j m)
@@ -30,9 +29,8 @@ moveJogador j InterageCaixa = interageCaixa j
 
 -- |Por exemplo:
 
--- |correrMovimentos 
+-- |correrMovimentos m1e1 [AndarEsquerda, Trepar, AndarEsquerda, AndarEsquerda] = m1e2
 
--- |correrMovimentos 
 correrMovimentos :: Jogo -> [Movimento] -> Jogo
 correrMovimentos jogo [] = jogo
 correrMovimentos jogo (h:t) = correrMovimentos (moveJogador jogo h) t
@@ -42,9 +40,10 @@ correrMovimentos jogo (h:t) = correrMovimentos (moveJogador jogo h) t
 
 -- |Por exemplo:
 
--- |trepa 
+-- |trepa (Jogador (3, 3) Este False) m1r = (Jogador (4, 2) Este False) 
 
--- |trepa  
+-- |trepa (Jogador (2, 3) Este False) m1r = (Jogador (2, 3) Este False)
+
 trepa :: Jogador -> Mapa -> Jogador 
 trepa j@(Jogador (x,y) dir caixa) m 
                      | not caixa && dir == Este && (getPeca m (x+1) y == Bloco || getPeca m (x+1) y == Caixa) && (getPeca m (x+1) (y+1) == Vazio || getPeca m (x+1) (y+1) == Porta) = Jogador (x+1,y+1) dir caixa
@@ -62,9 +61,10 @@ trepa j@(Jogador (x,y) dir caixa) m
 
 -- |Por exemplo:
 
--- |andaDirJogador 
+-- |andaDirJogador (Jogador (2, 3) Oeste False) m1r = (Jogador (3, 3) Oeste False)
 
--- |andaDirJogador 
+-- |andaDirJogador (Jogador (6, 0) Oeste False) m1r = (Jogador (6, 0) Este False) (pois está no limite do mapa)
+
 andaDirJogador :: Jogador -> Mapa -> Jogador
 andaDirJogador (Jogador (x,y) dir caixa) m 
              | getPeca m (x+1) y == Bloco || getPeca m (x+1) y == Caixa = Jogador (x,y) Este caixa
@@ -76,9 +76,10 @@ andaDirJogador (Jogador (x,y) dir caixa) m
 
 -- |Por exemplo:
 
--- |andaEsqJogador 
+-- |andaEsqJogador  (Jogador (2, 3) Oeste False) m1r = (Jogador (1, 3) Oeste False)
 
--- |andaEsqJogador  
+-- |andaEsqJogador   (Jogador (5, 3) Este False) m1r = (Jogador (5, 3) Oeste False)  (pois existe um obstáculo)
+
 andaEsqJogador :: Jogador -> Mapa -> Jogador 
 andaEsqJogador (Jogador (x,y) esq caixa) m 
              | getPeca m (x-1) y == Bloco || getPeca m (x-1) y == Caixa = Jogador (x,y) Oeste caixa
@@ -91,9 +92,12 @@ andaEsqJogador (Jogador (x,y) esq caixa) m
 
 -- |Por exemplo:
 
--- |interageCaixa  
+-- |interageCaixa  (Jogador (3, 3) Este False) m1r =  (Jogador (3, 3) Este True) m1r
 
--- |interageCaixa 
+-- |interageCaixa  (Jogador (2, 3) Este False) m1r =  (Jogador (2, 3) Este False) m1r (pois não existe caixa para apanhar ou largar)
+
+-- |interageCaixa  (Jogador (3, 3) Este True) m1r = (Jogador (3, 3) Este False) m1r (pousou uma caixa)
+
 interageCaixa :: Jogo -> Jogo  
 interageCaixa jog@(Jogo m j@(Jogador (x,y) dir caixa)) | caixa && dir == Este && getPeca m (x+1) (y+1) == Vazio 
                                                                           && (getPeca m (x+1) y == Bloco || getPeca m (x+1) y == Caixa) = Jogo (setPeca m Caixa (x+1) (y+1)) (Jogador (x,y) dir False)
@@ -106,13 +110,12 @@ interageCaixa jog@(Jogo m j@(Jogador (x,y) dir caixa)) | caixa && dir == Este &&
                                                        | otherwise = jog
                                                    
 
--- |Devolve o tipo de peca duma dada posicao no mapa.
+-- |A função getPeca devolve o tipo de peca duma dada posicao no mapa.
 
 -- |Por exemplo:
 
--- |getPeca   
+-- |getPeca m1r 0 3 = Porta
 
--- |getPeca 
 getPeca :: Mapa -> Int -> Int -> Peca
 getPeca [] _ _ = Vazio
 getPeca (h:t) x 0 = getLinha h x
@@ -122,9 +125,8 @@ getPeca (h:t) x y = getPeca t x (y-1)
 
 -- |Por exemplo:
 
--- |getLinha    
-
--- |getLinha 
+-- |getLinha [Bloco,Bloco,Porta] 3 = Porta   
+ 
 getLinha :: [Peca] -> Int -> Peca
 getLinha [] _ = Vazio
 getLinha (h:t) 0 = h
@@ -132,11 +134,12 @@ getLinha (h:t) x = getLinha t (x-1)
 
 -- |Trocar uma peça numa posição do mapa para o tipo recebido no argumento.
 
--- |Por exemplo:
+-- |Por exemplo: 
 
--- |setPeca    
+-- |setPeca [[Vazio,Vazio,Vazio,Bloco],[Vazio,Vazio,Caixa,Bloco],[Bloco,Bloco,Bloco,Bloco]] 2 1 Vazio = [[Vazio,Vazio,Vazio,Bloco],[Vazio,Vazio,Vazio,Bloco],[Bloco,Bloco,Bloco,Bloco]]   
 
 -- |setPeca 
+
 setPeca :: Mapa -> Peca -> Int -> Int -> Mapa 
 setPeca [] _ _ _ = []
 setPeca (h:t) p x 0 = setLinha h p x : t
@@ -146,9 +149,8 @@ setPeca (h:t) p x y = h : setPeca t p x (y-1)
 
 -- |Por exemplo:
 
--- |setLinha    
+-- |setLinha [Vazio,Vazio,Caixa,Bloco] Vazio 2 = [Vazio,Vazio,Vazio,Bloco]    
 
--- |setLinha 
 setLinha :: [Peca] -> Peca -> Int -> [Peca]
 setLinha [] _ _ = []
 setLinha (h:t) p 0 = p:t
