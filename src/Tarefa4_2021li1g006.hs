@@ -10,18 +10,30 @@ module Tarefa4_2021li1g006 where
 
 import LI12122
 import GHC.Stack.Types (CallStack(FreezeCallStack))
+import Language.Haskell.TH (javaScript)
 
 moveJogador :: Jogo -> Movimento -> Jogo
 moveJogador (Jogo m j) AndarDireita = Jogo m (andaDirJogador j m)
 moveJogador (Jogo m j) AndarEsquerda = Jogo m (andaEsqJogador j m)
+moveJogador (Jogo m j) Trepar = Jogo m (trepa j m)
 -- moveJogador (Jogo m j) InterageCaixa = 
--- moveJogador (Jogo m j@(Jogador c dir b)) Trepar | dir == Este = trepaDir j m
---                                                 | otherwise = trepaEsq j m
 
 
 correrMovimentos :: Jogo -> [Movimento] -> Jogo
 correrMovimentos jogo [] = jogo
 correrMovimentos jogo (h:t) = correrMovimentos (moveJogador jogo h) t
+
+
+trepa :: Jogador -> Mapa -> Jogador 
+trepa j@(Jogador (x,y) dir caixa) m 
+                     | not caixa && dir == Este && (getPeca m (x+1) y == Bloco || getPeca m (x+1) y == Caixa) && (getPeca m (x+1) (y+1) == Vazio || getPeca m (x+1) (y+1) == Porta) = Jogador (x+1,y+1) dir caixa
+                     | not caixa && dir == Oeste && (getPeca m (x-1) y == Bloco || getPeca m (x-1) y == Caixa) && (getPeca m (x-1) (y+1) == Vazio || getPeca m (x-1) (y+1) == Porta) = Jogador (x-1,y+1) dir caixa
+                     | caixa && dir == Este && (getPeca m (x+1) y == Bloco || getPeca m (x+1) y == Caixa) && (getPeca m (x+1) (y+1) == Vazio || getPeca m (x+1) (y+1) == Porta)
+                                                                                                                  && (getPeca m (x+1) (y+2) == Vazio || getPeca m (x+1) (y+2) == Porta) = Jogador (x+1,y+1) dir caixa
+                     | caixa && dir == Oeste && (getPeca m (x-1) y == Bloco || getPeca m (x-1) y == Caixa) && (getPeca m (x-1) (y+1) == Vazio || getPeca m (x-1) (y+1) == Porta)
+                                                                                                                   && (getPeca m (x-1) (y+2) == Vazio || getPeca m (x-1) (y+2) == Porta) = Jogador (x-1,y+1) dir caixa
+                     | otherwise = j
+
 
 
 -- NOTA: confirmar que nao ha peças vazias quando y é 0
@@ -40,11 +52,7 @@ andaEsqJogador (Jogador (x,y) esq caixa) m
              | getPeca m (x-1) y == Vazio =
                     if getPeca m (x-1) (y-1) == Bloco || getPeca m (x-1) (y-1) == Caixa then Jogador (x-1,y) Oeste caixa
                     else andaEsqJogador (Jogador (x,y-1) Oeste caixa) m
-
--- trepa (fazer) -> TER EM CONSIDERAÇÃO A DIREÇÃO DO JOGADOR <-
---     trepaDir
---     trepaEsq
-
+                    
 -- interageCaixa (fazer)
 
 -- Devolve o tipo de peca duma dada posicao no mapa
