@@ -138,7 +138,7 @@ getLinha (h:t) x = getLinha t (x-1)
 
 -- |setPeca [[Vazio,Vazio,Vazio,Bloco],[Vazio,Vazio,Caixa,Bloco],[Bloco,Bloco,Bloco,Bloco]] 2 1 Vazio = [[Vazio,Vazio,Vazio,Bloco],[Vazio,Vazio,Vazio,Bloco],[Bloco,Bloco,Bloco,Bloco]]   
 
--- |setPeca 
+-- |setPeca [[Vazio,Vazio,Vazio,Bloco],[Vazio,Vazio,Caixa,Bloco],[Bloco,Bloco,Bloco,Bloco]] 0 2 Vazio = [[Vazio,Vazio,Vazio,Bloco],[Vazio,Vazio,Caixa,Bloco],[Vazio,Bloco,Bloco,Bloco]]   
 
 setPeca :: Mapa -> Peca -> Int -> Int -> Mapa 
 setPeca [] _ _ _ = []
