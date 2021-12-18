@@ -9,49 +9,75 @@ Módulo para a realização da Tarefa 5 do projeto de LI1 em 2021/22.
 
 module Main where
 
-import Tarefa1_2021li1g006
-import Tarefa2_2021li1g006
-import Tarefa3_2021li1g006
-import Tarefa4_2021li1g006
-import LI12122
 import Graphics.Gloss
 import Graphics.Gloss.Interface.IO.Game
 import Graphics.Gloss.Juicy
 
-type Estado = (MenuJogo, EstadoJogo)
+data Jogo = Jogo (Int, Int) [(Int, Int)]
 
-data MenuJogo = Menu | Jogar
-inicio :: MenuJogo
-inicio = Menu
+data Opcoes = Jogar
+            | Sair
 
-type EstadoJogo = (Int,Int)
+data Menu = Controlador Opcoes
+          | ModoJogo Jogo
+          | VenceuJogo
 
-jogoInicial :: Estado
-jogoInicial = (Jogar,(0,0))
+type World = (Menu, Jogo)
 
 window :: Display
-window = InWindow "Block Dude - Joao Baptista e Mariana Pinto" (400, 400) (760,340)
+window = InWindow "Jumper Dude by Joao Baptista e Mariana Pinto" (600, 400) (760,340)
 
-playlogo :: Picture 
-playlogo = pictures
-    [ translate 0 50 $ color black $ rectangleSolid 102 27
-    , translate 0 50 $ color white $ rectangleSolid 100 25
-    , translate (-14) 43 $ scale 0.13 0.13 $ text "Play"]
+fr :: Int
+fr = 144
 
-reageEvento :: Event -> Estado -> Estado
-reageEvento e (Menu,(a,b)) = reageEventoMenu e (Menu,(a,b))
-reageEvento e (Jogar,(a,b)) = reageEventoJogo e (Jogar,(a,b))
+playlogo :: String -> Picture 
+playlogo texto = pictures
+    [ translate 0 50 $ color black $ rectangleSolid 204 54
+    , translate 0 50 $ color (greyN 0.8) $ rectangleSolid 200 50
+    , translate (-29) 38 $ scale 0.26 0.26 $ text texto]
 
-reageEventoJogo :: Event -> Estado -> Estado
-reageEventoJogo e (Jogar,(x,y)) = (Jogar,(x,y))
 
-reageEventoMenu :: Event -> Estado -> Estado 
-reageEventoMenu e@(EventKey (MouseButton LeftButton) Down _ (x,y)) (Menu,(a,b)) = if x >= (-51) && x <= 51 && y >= (-13.5) && y <= 13.5 then reageEventoJogo e jogoInicial else (Menu,(a,b))
 
-main:: IO ()
+draw :: Picture -> World -> Picture
+draw pic (VenceuJogo, jogo) = Pictures [Translate (-280) (-40) $ Color (dark green) $ Text "You Win!", translate (-230) (150) $ scale 0.3 0.3 pic]
+draw pic (Controlador Jogar, jogo) = Pictures [Color blue $ Translate (-110) (-100) $ playlogo "Play", Translate 110 (-100) $ playlogo "Exit", translate 0 100 $ scale 0.5 0.5 pic]
+draw pic (Controlador Sair, jogo) = Pictures [Translate (-110) (-100) $ playlogo "Play", Color magenta $ Translate 110 (-100) $ playlogo "Exit", translate 0 100 $ scale 0.5 0.5 pic]
+draw pic (ModoJogo (Jogo (x, y) l), jogo) = Pictures [translate (-230) (150) $ scale 0.3 0.3 pic]
+
+drawOption :: String -> Picture
+drawOption option = Translate (-60) 20 $ Scale 0.5 0.5 $ Text option
+
+drawSmallCircles :: (Int, Int) -> Picture
+drawSmallCircles (x, y) = Translate i j $ Circle 5
+    where
+      i = fromIntegral x
+      j = fromIntegral y
+
+engine :: (Int, Int) -> [(Int, Int)] -> Jogo
+engine p l = Jogo p (filter (p/=) l)
+
+event :: Event -> World -> World
+event (EventKey (SpecialKey KeyEnter) Down _ _) (Controlador Jogar, jogo) = (ModoJogo jogo, jogo)
+event (EventKey (SpecialKey KeyLeft) Down _ _) (Controlador Jogar, jogo) = (Controlador Sair, jogo)
+event (EventKey (SpecialKey KeyRight) Down _ _) (Controlador Jogar, jogo) = (Controlador Sair, jogo)
+event (EventKey (SpecialKey KeyLeft) Down _ _) (Controlador Sair, jogo) = (Controlador Jogar, jogo)
+event (EventKey (SpecialKey KeyRight) Down _ _) (Controlador Sair, jogo) = (Controlador Jogar, jogo)
+event (EventKey (SpecialKey KeyEnter) Down _ _) (Controlador Sair, jogo) = undefined
+event (EventKey (SpecialKey KeyEnter) Down _ _) (VenceuJogo, jogo) = (Controlador Jogar, jogo)
+event _ (ModoJogo (Jogo (x, y) []), jogo) = (VenceuJogo, jogo)
+event (EventKey (SpecialKey KeyUp) Down _ _) (ModoJogo (Jogo (x, y) l), jogo) = (ModoJogo $ engine (x, y + 50) l, jogo)
+event (EventKey (SpecialKey KeyDown) Down _ _) (ModoJogo (Jogo (x, y) l), jogo) = (ModoJogo $ engine (x, y - 50) l, jogo)
+event (EventKey (SpecialKey KeyLeft) Down _ _) (ModoJogo (Jogo (x, y) l), jogo) = (ModoJogo $ engine (x - 50, y) l, jogo)
+event (EventKey (SpecialKey KeyRight) Down _ _) (ModoJogo (Jogo (x, y) l), jogo) = (ModoJogo $ engine (x + 50, y) l, jogo)
+event _ w = w
+
+time :: Float -> World -> World
+time _ w = w
+
+estado :: World
+estado = (Controlador Jogar, Jogo (200, 100) [(50, 50), (-250, -100), (-100, -50)])
+
+main :: IO ()
 main = do
-    play window
-      white
-      50
-      mainInicial
-      reageEvento
+  logo <- loadBMP "Logo.bmp"
+  play window (greyN 0.263) fr estado (draw logo) event time
