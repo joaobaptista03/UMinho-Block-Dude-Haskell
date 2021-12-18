@@ -40,8 +40,8 @@ playlogo texto = pictures
 
 draw :: Picture -> World -> Picture
 draw pic (VenceuJogo, jogo) = Pictures [Translate (-280) (-40) $ Color (dark green) $ Text "You Win!", translate (-230) (150) $ scale 0.3 0.3 pic]
-draw pic (Controlador Jogar, jogo) = Pictures [Color blue $ Translate (-110) (-100) $ playlogo "Play", Translate 110 (-100) $ playlogo "Exit", translate 0 100 $ scale 0.5 0.5 pic]
-draw pic (Controlador Sair, jogo) = Pictures [Translate (-110) (-100) $ playlogo "Play", Color magenta $ Translate 110 (-100) $ playlogo "Exit", translate 0 100 $ scale 0.5 0.5 pic]
+draw pic (Controlador Jogar, jogo) = Pictures [Color (bright magenta) $ Translate (-110) (-100) $ playlogo "Play", Translate 110 (-100) $ playlogo "Exit", translate 0 100 $ scale 0.5 0.5 pic]
+draw pic (Controlador Sair, jogo) = Pictures [Translate (-110) (-100) $ playlogo "Play", Color (makeColor 0 212 255 1) $ Translate 110 (-100) $ playlogo "Exit", translate 0 100 $ scale 0.5 0.5 pic]
 draw pic (ModoJogo (Jogo (x, y) l), jogo) = Pictures [translate (-230) (150) $ scale 0.3 0.3 pic]
 
 drawOption :: String -> Picture
