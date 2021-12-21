@@ -12,23 +12,29 @@ module Main where
 import Graphics.Gloss
 import Graphics.Gloss.Interface.IO.Game
 import Graphics.Gloss.Juicy
+import System.Exit
+import Tarefa1_2021li1g006
+import Tarefa2_2021li1g006
+import Tarefa3_2021li1g006
+import Tarefa4_2021li1g006
+import LI12122
 
-data Jogo = Jogo (Int, Int) [(Int, Int)]
+data Jogoo = Jogoo (Int, Int) [(Int, Int)]
 
 data Opcoes = Jogar
             | Sair
 
 data Menu = Controlador Opcoes
-          | ModoJogo Jogo
+          | ModoJogo Jogoo
           | VenceuJogo
 
-type World = (Menu, Jogo)
+type World = (Menu, Jogoo)
 
 window :: Display
-window = InWindow "Jumper Dude by Joao Baptista e Mariana Pinto" (600, 400) (760,340)
+window = InWindow "Jumper Dude - by Joao Baptista e Mariana Pinto" (552, 400) (700,340)
 
 fr :: Int
-fr = 144
+fr = 50
 
 playlogo :: String -> Picture 
 playlogo texto = pictures
@@ -38,23 +44,24 @@ playlogo texto = pictures
 
 
 
-draw :: Picture -> World -> Picture
-draw pic (VenceuJogo, jogo) = Pictures [Translate (-280) (-40) $ Color (dark green) $ Text "You Win!", translate (-230) (150) $ scale 0.3 0.3 pic]
-draw pic (Controlador Jogar, jogo) = Pictures [Color (bright magenta) $ Translate (-110) (-100) $ playlogo "Play", Translate 110 (-100) $ playlogo "Exit", translate 0 100 $ scale 0.5 0.5 pic]
-draw pic (Controlador Sair, jogo) = Pictures [Translate (-110) (-100) $ playlogo "Play", Color (makeColor 0 212 255 1) $ Translate 110 (-100) $ playlogo "Exit", translate 0 100 $ scale 0.5 0.5 pic]
-draw pic (ModoJogo (Jogo (x, y) l), jogo) = Pictures [translate (-230) (150) $ scale 0.3 0.3 pic]
+draw :: Picture -> Picture -> World -> Picture
+draw logo caixa (VenceuJogo, jogo) = Pictures [Translate (-280) (-40) $ Color (dark green) $ translate 60 10 $ scale 0.7 0.7 $ Text "It's a Win!", translate (-230) (150) $ scale 0.3 0.3 logo]
+draw logo caixa (Controlador Jogar, jogo) = Pictures [Color (bright magenta) $ Translate (-110) (-100) $ playlogo "Play", Translate 110 (-100) $ playlogo "Exit", translate 0 100 $ scale 0.5 0.5 logo]
+draw logo caixa (Controlador Sair, jogo) = Pictures [Translate (-110) (-100) $ playlogo "Play", Color (makeColor 0 212 255 1) $ Translate 110 (-100) $ playlogo "Exit", translate 0 100 $ scale 0.5 0.5 logo]
+draw logo caixa (ModoJogo (Jogoo (x, y) l), jogo) = Pictures $ map (caixas caixa) l ++ [Translate i j $ Color green (circleSolid 20)] ++ [translate (-212) (154) $ scale 0.3 0.3 logo]
+  where
+    i = fromIntegral x
+    j = fromIntegral y
 
-drawOption :: String -> Picture
-drawOption option = Translate (-60) 20 $ Scale 0.5 0.5 $ Text option
-
-drawSmallCircles :: (Int, Int) -> Picture
-drawSmallCircles (x, y) = Translate i j $ Circle 5
+caixas :: Picture -> (Int, Int) -> Picture
+caixas pic (x, y) = Translate i j $ scale 0.3955 0.3955 pic 
     where
       i = fromIntegral x
       j = fromIntegral y
 
-engine :: (Int, Int) -> [(Int, Int)] -> Jogo
-engine p l = Jogo p (filter (p/=) l)
+
+drawOption :: String -> Picture
+drawOption option = Translate (-60) 20 $ Scale 0.5 0.5 $ Text option
 
 event :: Event -> World -> World
 event (EventKey (SpecialKey KeyEnter) Down _ _) (Controlador Jogar, jogo) = (ModoJogo jogo, jogo)
@@ -64,20 +71,25 @@ event (EventKey (SpecialKey KeyLeft) Down _ _) (Controlador Sair, jogo) = (Contr
 event (EventKey (SpecialKey KeyRight) Down _ _) (Controlador Sair, jogo) = (Controlador Jogar, jogo)
 event (EventKey (SpecialKey KeyEnter) Down _ _) (Controlador Sair, jogo) = undefined
 event (EventKey (SpecialKey KeyEnter) Down _ _) (VenceuJogo, jogo) = (Controlador Jogar, jogo)
-event _ (ModoJogo (Jogo (x, y) []), jogo) = (VenceuJogo, jogo)
-event (EventKey (SpecialKey KeyUp) Down _ _) (ModoJogo (Jogo (x, y) l), jogo) = (ModoJogo $ engine (x, y + 50) l, jogo)
-event (EventKey (SpecialKey KeyDown) Down _ _) (ModoJogo (Jogo (x, y) l), jogo) = (ModoJogo $ engine (x, y - 50) l, jogo)
-event (EventKey (SpecialKey KeyLeft) Down _ _) (ModoJogo (Jogo (x, y) l), jogo) = (ModoJogo $ engine (x - 50, y) l, jogo)
-event (EventKey (SpecialKey KeyRight) Down _ _) (ModoJogo (Jogo (x, y) l), jogo) = (ModoJogo $ engine (x + 50, y) l, jogo)
+event _ (ModoJogo (Jogoo (x, y) []), jogo) = (VenceuJogo, jogo)
+event (EventKey (SpecialKey KeyUp) Down _ _) (ModoJogo (Jogoo (x, y) l), jogo) | elem (x + 50,y) l = (ModoJogo (Jogoo (x, y) l), jogo)
+                                                                               | otherwise = (ModoJogo (Jogoo (x, y + 50) l), jogo)
+event (EventKey (SpecialKey KeyDown) Down _ _) (ModoJogo (Jogoo (x, y) l), jogo) | elem (x,y - 50) l = (ModoJogo (Jogoo (x, y) l), jogo)
+                                                                                 | otherwise = (ModoJogo (Jogoo (x, y - 50) l), jogo)
+event (EventKey (SpecialKey KeyLeft) Down _ _) (ModoJogo (Jogoo (x, y) l), jogo) | elem (x - 50,y) l = (ModoJogo (Jogoo (x, y) l), jogo)
+                                                                                 | otherwise = (ModoJogo (Jogoo (x - 50, y) l), jogo)
+event (EventKey (SpecialKey KeyRight) Down _ _) (ModoJogo (Jogoo (x, y) l), jogo) | elem (x + 50,y) l = (ModoJogo (Jogoo (x, y) l), jogo)
+                                                                                  | otherwise = (ModoJogo (Jogoo (x + 50, y) l), jogo)
 event _ w = w
 
 time :: Float -> World -> World
 time _ w = w
 
 estado :: World
-estado = (Controlador Jogar, Jogo (200, 100) [(50, 50), (-250, -100), (-100, -50)])
+estado = (Controlador Jogar, Jogoo (0, 0) [(-250,-150),(-200,-150),(-150,-150),(-100,-150),(-50,-150),(0,-150),(50,-150),(100,-150),(150,-150),(200,-150),(250,-150)])
 
 main :: IO ()
 main = do
+  caixa <- loadBMP "Caixa.bmp"
   logo <- loadBMP "Logo.bmp"
-  play window (greyN 0.263) fr estado (draw logo) event time
+  play window (greyN 0.263) fr estado (draw logo caixa) event time
