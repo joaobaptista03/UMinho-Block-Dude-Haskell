@@ -72,21 +72,48 @@ event (EventKey (SpecialKey KeyRight) Down _ _) (Controlador Sair, jogo) = (Cont
 event (EventKey (SpecialKey KeyEnter) Down _ _) (Controlador Sair, jogo) = undefined
 event (EventKey (SpecialKey KeyEnter) Down _ _) (VenceuJogo, jogo) = (Controlador Jogar, jogo)
 event _ (ModoJogo (Jogoo (x, y) [] d), jogo) = (VenceuJogo, jogo)
-event (EventKey (SpecialKey KeyUp) Down _ _) (ModoJogo (Jogoo (x, y) l d), jogo) | (x + 50,y) `elem` l = if d == Oeste then (ModoJogo (Jogoo (x, y) l Oeste), jogo) else (ModoJogo (Jogoo (x, y) l Este), jogo)
-                                                                                 | otherwise = if d == Oeste then (ModoJogo (Jogoo (x, y + 50) l Oeste), jogo) else (ModoJogo (Jogoo (x, y + 50) l Este), jogo)
-event (EventKey (SpecialKey KeyDown) Down _ _) (ModoJogo (Jogoo (x, y) l d), jogo) | (x,y - 50) `elem` l = if d == Oeste then (ModoJogo (Jogoo (x, y) l Oeste), jogo) else (ModoJogo (Jogoo (x, y) l Este), jogo)
-                                                                                   | otherwise = if d == Oeste then (ModoJogo (Jogoo (x, y - 50) l Oeste), jogo) else (ModoJogo (Jogoo (x, y - 50) l Este), jogo)
-event (EventKey (SpecialKey KeyLeft) Down _ _) (ModoJogo (Jogoo (x, y) l d), jogo) | (x - 50,y) `elem` l = (ModoJogo (Jogoo (x, y) l Oeste), jogo)
-                                                                                   | otherwise = (ModoJogo (Jogoo (x - 50, y) l Oeste), jogo)
-event (EventKey (SpecialKey KeyRight) Down _ _) (ModoJogo (Jogoo (x, y) l d), jogo) | (x + 50,y) `elem` l = (ModoJogo (Jogoo (x, y) l Este), jogo)
-                                                                                    | otherwise = (ModoJogo (Jogoo (x + 50, y) l Este), jogo)
+event (EventKey (SpecialKey KeyUp) Down _ _) (ModoJogo (Jogoo (x, y) l d), jogo) | (x,y + 50) `elem` l = (ModoJogo (Jogoo (x, y) l d), jogo)
+                                                                                 | otherwise = if d == Oeste then 
+                                                                                                              if (x - 50, y) `elem` l && (x - 50, y + 50) `notElem` l
+                                                                                                                then (ModoJogo (Jogoo (x - 50, y + 50) l Oeste), jogo)
+                                                                                                              else (ModoJogo (Jogoo (x, y) l d), jogo)
+                                                                                                else if (x + 50, y) `elem` l && (x + 50, y + 50) `notElem` l
+                                                                                                                then (ModoJogo (Jogoo (x + 50, y + 50) l Este), jogo)
+                                                                                                              else (ModoJogo (Jogoo (x, y) l d), jogo)
+event (EventKey (SpecialKey KeyDown) Down _ _) (ModoJogo (Jogoo (x, y) l d), jogo) = if d == Oeste then 
+                                                                                                      if (x - 50, y - 100) `elem` l && (x - 50, y) `notElem` l && (x - 50, y - 50) `notElem` l
+                                                                                                        then (ModoJogo (Jogoo (x - 50, y - 50) l d), jogo)
+                                                                                                          else (ModoJogo (Jogoo (x, y) l d), jogo)
+                                                                                                      else if (x + 50, y - 100) `elem` l && (x + 50, y) `notElem` l && (x + 50, y - 50) `notElem` l
+                                                                                                            then (ModoJogo (Jogoo (x + 50, y - 50) l d), jogo)
+                                                                                                          else (ModoJogo (Jogoo (x, y) l d), jogo)
+event (EventKey (SpecialKey KeyLeft) Down _ _) (ModoJogo (Jogoo (x, y) l d), jogo) | (x - 50,y) `elem` l = if (x,y + 50) `elem` l then (ModoJogo (Jogoo (x, y) l Oeste), jogo)
+                                                                                                           else if d == Oeste then 
+                                                                                                              if (x - 50, y) `elem` l && (x - 50, y + 50) `notElem` l
+                                                                                                                then (ModoJogo (Jogoo (x - 50, y + 50) l Oeste), jogo)
+                                                                                                              else (ModoJogo (Jogoo (x, y) l Oeste), jogo)
+                                                                                                              else if (x + 50, y) `elem` l && (x + 50, y + 50) `notElem` l
+                                                                                                                then (ModoJogo (Jogoo (x + 50, y + 50) l Oeste), jogo)
+                                                                                                              else (ModoJogo (Jogoo (x, y) l Oeste), jogo)
+                                                                                   | otherwise = if (x - 50,y - 50) `notElem` l && (x - 50,y - 100) `elem` l then (ModoJogo (Jogoo (x - 50, y - 50) l Oeste), jogo)
+                                                                                                  else (ModoJogo (Jogoo (x-50, y) l Oeste), jogo)
+event (EventKey (SpecialKey KeyRight) Down _ _) (ModoJogo (Jogoo (x, y) l d), jogo) | (x + 50,y) `elem` l = if (x,y + 50) `elem` l then (ModoJogo (Jogoo (x, y) l Este), jogo)
+                                                                                                           else if d == Este then 
+                                                                                                              if (x + 50, y) `elem` l && (x + 50, y + 50) `notElem` l
+                                                                                                                then (ModoJogo (Jogoo (x + 50, y + 50) l Este), jogo)
+                                                                                                              else (ModoJogo (Jogoo (x, y) l Este), jogo)
+                                                                                                              else if (x - 50, y) `elem` l && (x - 50, y + 50) `notElem` l
+                                                                                                                then (ModoJogo (Jogoo (x - 50, y + 50) l Este), jogo)
+                                                                                                              else (ModoJogo (Jogoo (x, y) l Este), jogo)
+                                                                                   | otherwise = if (x + 50,y - 50) `notElem` l && (x + 50,y - 100) `elem` l then (ModoJogo (Jogoo (x + 50, y - 50) l Este), jogo)
+                                                                                                  else (ModoJogo (Jogoo (x + 50, y) l Este), jogo)
 event _ w = w
 
 time :: Float -> World -> World
 time _ w = w
 
 caixascords :: World
-caixascords = (Controlador Jogar, Jogoo (0, 0) [(-250,-150),(-200,-150),(-150,-150),(-100,-150),(-50,-150),(0,-150),(50,-150),(100,-150),(150,-150),(200,-150),(250,-150)] Este)
+caixascords = (Controlador Jogar, Jogoo (-250, -100) [(-250,-150),(-200,-150),(-150,-150),(-100,-150),(-50,-150),(0,-150),(50,-150),(100,-150),(150,-150),(200,-150),(250,-150),(-150,-100),(-150,0),(0,-100),(50,-100),(250,-100),(250,-50)] Este)
 
 main :: IO ()
 main = do
