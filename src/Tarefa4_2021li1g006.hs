@@ -69,7 +69,7 @@ andaDirJogador :: Jogador -> Mapa -> Jogador
 andaDirJogador (Jogador (x,y) dir caixa) m 
              | getPeca m (x+1) y == Bloco || getPeca m (x+1) y == Caixa = Jogador (x,y) Este caixa
              | getPeca m (x+1) y == Vazio =
-                    if getPeca m (x+1) (y-1) == Bloco || getPeca m (x+1) (y-1) == Caixa then Jogador (x+1,y) Este caixa
+                    if (getPeca m (x+1) (y-1) == Bloco || getPeca m (x+1) (y-1) == Caixa ) then (if caixa == False then Jogador (x+1,y) Este caixa else Jogador (x,y) Este False)
                     else andaDirJogador (Jogador (x,y-1) Este caixa) m
 
 -- |Faz com que o jogador se volte para Oeste e avance, se for possível, uma unidade.
@@ -84,7 +84,7 @@ andaEsqJogador :: Jogador -> Mapa -> Jogador
 andaEsqJogador (Jogador (x,y) esq caixa) m 
              | getPeca m (x-1) y == Bloco || getPeca m (x-1) y == Caixa = Jogador (x,y) Oeste caixa
              | getPeca m (x-1) y == Vazio =
-                    if getPeca m (x-1) (y-1) == Bloco || getPeca m (x-1) (y-1) == Caixa then Jogador (x-1,y) Oeste caixa
+                    if getPeca m (x-1) (y-1) == Bloco || getPeca m (x-1) (y-1) == Caixa then (if caixa == False then Jogador (x-1,y) Este caixa else Jogador (x,y) Este False)
                     else andaEsqJogador (Jogador (x,y-1) Oeste caixa) m
 
 
