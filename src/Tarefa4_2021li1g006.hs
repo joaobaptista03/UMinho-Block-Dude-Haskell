@@ -64,8 +64,8 @@ trepa j@(Jogador (x,y) dir caixa) m
 -- |andaDirJogador (Jogador (6, 0) Oeste False) m1r = (Jogador (6, 0) Este False) (pois está no limite do mapa)
 
 andaDirJogador :: Jogador -> Mapa -> Jogador
-andaDirJogador (Jogador (x,y) dir caixa) (h:t)
-             | x == length h = Jogador (x,y) dir caixa
+andaDirJogador (Jogador (x,y) dir caixa) m
+             | x == length (head m) = Jogador (x,y) dir caixa
              | getPeca m (x+1) y == Bloco || getPeca m (x+1) y == Caixa = Jogador (x,y) Este caixa
              | getPeca m (x+1) y == Porta = Jogador (x+1,y) Este caixa
              | otherwise = if getPeca m (x+1) (y+1) == Bloco || getPeca m (x+1) (y+1) == Caixa then Jogador (x+1,y) Este caixa
