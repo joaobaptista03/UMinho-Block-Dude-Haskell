@@ -11,6 +11,7 @@ module Tarefa4_2021li1g006 where
 import LI12122
 import GHC.Stack.Types (CallStack(FreezeCallStack))
 import Language.Haskell.TH (javaScript)
+import Tarefa1_2021li1g006
 
 
 -- |Aplica o efeito de um comando sobre o jogador.
@@ -18,7 +19,7 @@ import Language.Haskell.TH (javaScript)
 -- |Por exemplo:
 
 -- |moveJogador m1e1 AndarEsquerda = Jogo m1r (Jogador (5, 3) Oeste False)
- 
+
 moveJogador :: Jogo -> Movimento -> Jogo
 moveJogador (Jogo m j) AndarDireita = Jogo m (andaDirJogador j m)
 moveJogador (Jogo m j) AndarEsquerda = Jogo m (andaEsqJogador j m)
@@ -44,18 +45,15 @@ correrMovimentos jogo (h:t) = correrMovimentos (moveJogador jogo h) t
 
 -- |trepa (Jogador (2, 3) Este False) m1r = (Jogador (2, 3) Este False)
 
-trepa :: Jogador -> Mapa -> Jogador 
-trepa j@(Jogador (x,y) dir caixa) m 
-                     | not caixa && dir == Este && (getPeca m (x+1) y == Bloco || getPeca m (x+1) y == Caixa) && (getPeca m (x+1) (y+1) == Vazio || getPeca m (x+1) (y+1) == Porta) = Jogador (x+1,y+1) dir caixa
-                     | not caixa && dir == Oeste && (getPeca m (x-1) y == Bloco || getPeca m (x-1) y == Caixa) && (getPeca m (x-1) (y+1) == Vazio || getPeca m (x-1) (y+1) == Porta) = Jogador (x-1,y+1) dir caixa
-                     | caixa && dir == Este && (getPeca m (x+1) y == Bloco || getPeca m (x+1) y == Caixa) && (getPeca m (x+1) (y+1) == Vazio || getPeca m (x+1) (y+1) == Porta)
-                                                                                                                  && (getPeca m (x+1) (y+2) == Vazio || getPeca m (x+1) (y+2) == Porta) = Jogador (x+1,y+1) dir caixa
-                     | caixa && dir == Oeste && (getPeca m (x-1) y == Bloco || getPeca m (x-1) y == Caixa) && (getPeca m (x-1) (y+1) == Vazio || getPeca m (x-1) (y+1) == Porta)
-                                                                                                                   && (getPeca m (x-1) (y+2) == Vazio || getPeca m (x-1) (y+2) == Porta) = Jogador (x-1,y+1) dir caixa
+trepa :: Jogador -> Mapa -> Jogador
+trepa j@(Jogador (x,y) dir caixa) m
+                     | not caixa && dir == Este && (getPeca m (x+1) y == Bloco || getPeca m (x+1) y == Caixa) && (getPeca m (x+1) (y-1) == Vazio || getPeca m (x+1) (y-1) == Porta) = Jogador (x+1,y-1) dir caixa
+                     | not caixa && dir == Oeste && (getPeca m (x-1) y == Bloco || getPeca m (x-1) y == Caixa) && (getPeca m (x-1) (y-1) == Vazio || getPeca m (x-1) (y-1) == Porta) = Jogador (x-1,y-1) dir caixa
+                     | caixa && dir == Este && (getPeca m (x+1) y == Bloco || getPeca m (x+1) y == Caixa) && (getPeca m (x+1) (y-1) == Vazio || getPeca m (x+1) (y-1) == Porta)
+                                                                                                                  && getPeca m (x+1) (y-2) == Vazio = Jogador (x+1,y-1) dir caixa
+                     | caixa && dir == Oeste && (getPeca m (x-1) y == Bloco || getPeca m (x-1) y == Caixa) && (getPeca m (x-1) (y-1) == Vazio || getPeca m (x-1) (y-1) == Porta)
+                                                                                                                   && getPeca m (x-1) (y-2) == Vazio = Jogador (x-1,y-1) dir caixa
                      | otherwise = j
-
--- NOTA: confirmar que nao ha peças vazias quando y é 0
--- NOTA2: adicionar caso quando é porta
 
 -- |Faz com que o jogador se volte para Este e avance, se for possível, uma unidade.
 
@@ -66,26 +64,30 @@ trepa j@(Jogador (x,y) dir caixa) m
 -- |andaDirJogador (Jogador (6, 0) Oeste False) m1r = (Jogador (6, 0) Este False) (pois está no limite do mapa)
 
 andaDirJogador :: Jogador -> Mapa -> Jogador
-andaDirJogador (Jogador (x,y) dir caixa) m 
-             | getPeca m (x+1) y /= Vazio = Jogador (x,y) Este caixa
-             | getPeca m (x+1) y == Vazio =
-                    if getPeca m (x+1) (y-1) /= Vazio then (if caixa == False then Jogador (x+1,y) Este caixa else Jogador (x,y) Este False)
-                    else andaDirJogador (Jogador (x,y-1) Este caixa) m
+andaDirJogador (Jogador (x,y) dir caixa) (h:t)
+             | x == length h = Jogador (x,y) dir caixa
+             | getPeca m (x+1) y == Bloco || getPeca m (x+1) y == Caixa = Jogador (x,y) Este caixa
+             | getPeca m (x+1) y == Porta = Jogador (x+1,y) Este caixa
+             | otherwise = if getPeca m (x+1) (y+1) == Bloco || getPeca m (x+1) (y+1) == Caixa then Jogador (x+1,y) Este caixa
+             else if getPeca m (x+1) (y+1) == Porta then Jogador (x+1,y-1) Este caixa
+             else andaDirJogador (Jogador (x,y+1) Este caixa) m
 
 -- |Faz com que o jogador se volte para Oeste e avance, se for possível, uma unidade.
 
 -- |Por exemplo:
 
--- |andaEsqJogador  (Jogador (2, 3) Oeste False) m1r = (Jogador (1, 3) Oeste False)
+-- |andaEsqJogador (Jogador (2, 3) Oeste False) m1r = (Jogador (1, 3) Oeste False)
 
--- |andaEsqJogador   (Jogador (5, 3) Este False) m1r = (Jogador (5, 3) Oeste False)  (pois existe um obstáculo)
+-- |andaEsqJogador (Jogador (5, 3) Este False) m1r = (Jogador (5, 3) Oeste False)  (pois existe um obstáculo)
 
-andaEsqJogador :: Jogador -> Mapa -> Jogador 
-andaEsqJogador (Jogador (x,y) esq caixa) m 
-             | getPeca m (x-1) y /= Vazio = Jogador (x,y) Oeste caixa
-             | getPeca m (x-1) y == Vazio =
-                    if getPeca m (x-1) (y-1) /= Vazio then (if caixa == False then Jogador (x-1,y) Este caixa else Jogador (x,y) Este False)
-                    else andaEsqJogador (Jogador (x,y-1) Oeste caixa) m
+andaEsqJogador :: Jogador -> Mapa -> Jogador
+andaEsqJogador (Jogador (x,y) dir caixa) m
+             | x == 0 = Jogador (x,y) dir caixa
+             | getPeca m (x-1) y == Bloco || getPeca m (x-1) y == Caixa = Jogador (x,y) Oeste caixa
+             | getPeca m (x-1) y == Porta = Jogador (x-1,y) Oeste caixa
+             | otherwise = if getPeca m (x-1) (y+1) == Bloco || getPeca m (x-1) (y+1) == Caixa then Jogador (x-1,y) Oeste caixa
+             else if getPeca m (x-1) (y+1) == Porta then Jogador (x-1,y-1) Oeste caixa
+             else andaEsqJogador (Jogador (x,y+1) Oeste caixa) m
 
 
 -- |A função permite ao jogador carregar/largar uma caixa.
@@ -98,17 +100,20 @@ andaEsqJogador (Jogador (x,y) esq caixa) m
 
 -- |interageCaixa  (Jogador (3, 3) Este True) m1r = (Jogador (3, 3) Este False) m1r (pousou uma caixa)
 
-interageCaixa :: Jogo -> Jogo  
-interageCaixa jog@(Jogo m j@(Jogador (x,y) dir caixa)) | caixa && dir == Este && getPeca m (x+1) (y+1) == Vazio 
-                                                                          && (getPeca m (x+1) y == Bloco || getPeca m (x+1) y == Caixa) = Jogo (setPeca m Caixa (x+1) (y+1)) (Jogador (x,y) dir False)
-                                                       | caixa && dir == Este && getPeca m (x+1) (y+1) == Vazio && getPeca m (x+1) y == Vazio = interageCaixa (Jogo m (Jogador (x,y-1) dir caixa))
-                                                       | caixa && dir == Oeste && getPeca m (x-1) (y+1) == Vazio 
-                                                                               && (getPeca m (x-1) y == Bloco || getPeca m (x-1) y == Caixa) = Jogo (setPeca m Caixa (x-1) (y+1)) (Jogador (x,y) dir False)
-                                                       | caixa && dir == Oeste && getPeca m (x-1) (y+1) == Vazio && getPeca m (x-1) y == Vazio = interageCaixa (Jogo m (Jogador (x,y-1) dir caixa))
-                                                       | not caixa && dir == Este && getPeca m (x+1) y == Caixa && getPeca m x (y+1) == Vazio && getPeca m (x+1) (y+1) == Vazio = Jogo (setPeca m Vazio (x+1) y) (Jogador (x,y) dir True)
-                                                       | not caixa && dir == Oeste && getPeca m (x-1) y == Caixa && getPeca m x (y+1) == Vazio && getPeca m (x-1) (y+1) == Vazio = Jogo (setPeca m Vazio (x-1) y) (Jogador (x,y) dir True)
+interageCaixa :: Jogo -> Jogo
+interageCaixa jog@(Jogo m j@(Jogador (x,y) dir caixa)) 
+                                                       | caixa && dir == Este && getPeca m (x+1) (y-1) == Vazio && (getPeca m (x+1) y == Bloco || getPeca m (x+1) y == Caixa) && getPeca m x (y-1) == Vazio
+                                                        = Jogo (setPeca m Caixa (x+1) (y-1)) (Jogador (x,y) dir False)
+                                                       | caixa && dir == Oeste && getPeca m (x-1) (y-1) == Vazio && (getPeca m (x-1) y == Bloco || getPeca m (x-1) y == Caixa) && getPeca m x (y-1) == Vazio
+                                                        = Jogo (setPeca m Caixa (x-1) (y-1)) (Jogador (x,y) dir False)
+                                                       | caixa && dir == Este && getPeca m (x+1) (y-1) == Vazio && getPeca m x (y-1) == Vazio && getPeca m (x+1) y == Vazio
+                                                        = interageCaixa (Jogo m (Jogador (x,y+1) dir caixa))
+                                                       | caixa && dir == Oeste && getPeca m (x-1) (y-1) == Vazio && getPeca m x (y-1) == Vazio && getPeca m (x-1) y == Vazio
+                                                        = interageCaixa (Jogo m (Jogador (x,y+1) dir caixa))
+                                                       | not caixa && dir == Este && getPeca m (x+1) y == Caixa && getPeca m x (y-1) == Vazio && getPeca m (x+1) (y-1) == Vazio = Jogo (setPeca m Vazio (x+1) y) (Jogador (x,y) dir True)
+                                                       | not caixa && dir == Oeste && getPeca m (x-1) y == Caixa && getPeca m x (y-1) == Vazio && getPeca m (x-1) (y-1) == Vazio = Jogo (setPeca m Vazio (x-1) y) (Jogador (x,y) dir True)
                                                        | otherwise = jog
-                                                   
+
 
 -- |A função getPeca devolve o tipo de peca duma dada posicao no mapa.
 
@@ -126,7 +131,7 @@ getPeca (h:t) x y = getPeca t x (y-1)
 -- |Por exemplo:
 
 -- |getLinha [Bloco,Bloco,Porta] 3 = Porta   
- 
+
 getLinha :: [Peca] -> Int -> Peca
 getLinha [] _ = Vazio
 getLinha (h:t) 0 = h
@@ -136,11 +141,11 @@ getLinha (h:t) x = getLinha t (x-1)
 
 -- |Por exemplo: 
 
--- |setPeca [[Vazio,Vazio,Vazio,Bloco],[Vazio,Vazio,Caixa,Bloco],[Bloco,Bloco,Bloco,Bloco]] 2 1 Vazio = [[Vazio,Vazio,Vazio,Bloco],[Vazio,Vazio,Vazio,Bloco],[Bloco,Bloco,Bloco,Bloco]]   
+-- |setPeca [[Vazio,Vazio,Vazio,Bloco],[Vazio,Vazio,Caixa,Bloco],[Bloco,Bloco,Bloco,Bloco]] Vazio 2 1 = [[Vazio,Vazio,Vazio,Bloco],[Vazio,Vazio,Vazio,Bloco],[Bloco,Bloco,Bloco,Bloco]]   
 
--- |setPeca [[Vazio,Vazio,Vazio,Bloco],[Vazio,Vazio,Caixa,Bloco],[Bloco,Bloco,Bloco,Bloco]] 0 2 Vazio = [[Vazio,Vazio,Vazio,Bloco],[Vazio,Vazio,Caixa,Bloco],[Vazio,Bloco,Bloco,Bloco]]   
+-- |setPeca [[Vazio,Vazio,Vazio,Bloco],[Vazio,Vazio,Caixa,Bloco],[Bloco,Bloco,Bloco,Bloco]] Vazio 0 2 = [[Vazio,Vazio,Vazio,Bloco],[Vazio,Vazio,Caixa,Bloco],[Vazio,Bloco,Bloco,Bloco]]   
 
-setPeca :: Mapa -> Peca -> Int -> Int -> Mapa 
+setPeca :: Mapa -> Peca -> Int -> Int -> Mapa
 setPeca [] _ _ _ = []
 setPeca (h:t) p x 0 = setLinha h p x : t
 setPeca (h:t) p x y = h : setPeca t p x (y-1)
