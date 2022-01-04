@@ -51,8 +51,22 @@ draw logo caixa playerL playerR (ModoJogo (Jogo m (Jogador (x,y) d c))) = pictur
     i = fromIntegral x
     j = fromIntegral y
 
+jogoinicial :: Jogo 
+jogoinicial = Jogo mapa1 (Jogador (0,5) Este False)
+  where mapa1 = [
+                  [Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio]
+                , [Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio]
+                , [Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio]
+                , [Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio]
+                , [Vazio, Vazio, Bloco, Vazio, Vazio, Vazio, Vazio]
+                , [Vazio, Bloco, Bloco, Bloco, Vazio, Vazio, Porta]
+                , [Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco]
+                                                                  ]
+
+
+
 event :: Event -> Menu -> Menu
-event (EventKey (SpecialKey KeyEnter) Down _ _) (Controlador Jogar) = ModoJogo -- jogoinicial (falta jogo inicial)
+event (EventKey (SpecialKey KeyEnter) Down _ _) (Controlador Jogar) = ModoJogo jogoinicial
 event (EventKey (SpecialKey KeyLeft) Down _ _) (Controlador Jogar) = Controlador Sair
 event (EventKey (SpecialKey KeyRight) Down _ _) (Controlador Jogar) = Controlador Sair
 event (EventKey (SpecialKey KeyLeft) Down _ _) (Controlador Sair) = Controlador Jogar
@@ -68,6 +82,9 @@ event _ w = w
 time :: Float -> Menu -> Menu
 time _ w = w
 
+estado :: Menu
+estado = Controlador Jogar
+
 main :: IO ()
 main = do
   playerL <- loadBMP "playerL.bmp"
@@ -76,4 +93,4 @@ main = do
   logo <- loadBMP "Logo.bmp"
   bloco <- loadBMP "Bloco.bmp"
   porta <- loadBMP "Porta.bmp"
-  play window (greyN 0.263) fr (draw logo caixa playerL playerR) event time
+  play window (greyN 0.263) fr estado (draw logo caixa playerL playerR) event time
