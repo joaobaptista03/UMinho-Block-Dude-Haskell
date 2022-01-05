@@ -106,10 +106,10 @@ interageCaixa jog@(Jogo m j@(Jogador (x,y) dir caixa))
                                                         = Jogo (setPeca m Caixa (x+1) (y-1)) (Jogador (x,y) dir False)
                                                        | caixa && dir == Oeste && getPeca m (x-1) (y-1) == Vazio && (getPeca m (x-1) y == Bloco || getPeca m (x-1) y == Caixa) && getPeca m x (y-1) == Vazio
                                                         = Jogo (setPeca m Caixa (x-1) (y-1)) (Jogador (x,y) dir False)
-                                                       | caixa && dir == Este && getPeca m (x+1) (y-1) == Vazio && getPeca m x (y-1) == Vazio && getPeca m (x+1) y == Vazio
-                                                        = interageCaixa (Jogo m (Jogador (x,y+1) dir caixa))
-                                                       | caixa && dir == Oeste && getPeca m (x-1) (y-1) == Vazio && getPeca m x (y-1) == Vazio && getPeca m (x-1) y == Vazio
-                                                        = interageCaixa (Jogo m (Jogador (x,y+1) dir caixa))
+                                                       | caixa && dir == Este && getPeca m (x+1) (y-1) == Vazio && getPeca m x (y-1) == Vazio && getPeca m (x+1) y == Vazio && getPeca m (x+1) (y+1) == Bloco || getPeca m (x+1) (y+1) == Caixa
+                                                        = Jogo (setPeca m Caixa (x+1) y) (Jogador (x,y) dir False)
+                                                       | caixa && dir == Oeste && getPeca m (x-1) (y-1) == Vazio && getPeca m x (y-1) == Vazio && getPeca m (x-1) y == Vazio && getPeca m (x-1) (y+1) == Bloco || getPeca m (x-1) (y+1) == Caixa
+                                                        = Jogo (setPeca m Caixa (x-1) y) (Jogador (x,y) dir False)
                                                        | not caixa && dir == Este && getPeca m (x+1) y == Caixa && getPeca m x (y-1) == Vazio && getPeca m (x+1) (y-1) == Vazio = Jogo (setPeca m Vazio (x+1) y) (Jogador (x,y) dir True)
                                                        | not caixa && dir == Oeste && getPeca m (x-1) y == Caixa && getPeca m x (y-1) == Vazio && getPeca m (x-1) (y-1) == Vazio = Jogo (setPeca m Vazio (x-1) y) (Jogador (x,y) dir True)
                                                        | otherwise = jog
