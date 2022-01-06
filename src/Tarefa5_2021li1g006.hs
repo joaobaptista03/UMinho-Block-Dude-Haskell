@@ -191,3 +191,8 @@ main = do
     (draw logo block box door playerL playerR win mariana joaopedro)
     event
     time
+
+
+finishgame :: Float -> Menu -> Menu
+finishgame _ (GameMode (Jogo m (Jogador (x,y) d c))) | snd (saberPorta (desconstroiMapa m)) == (x,y) = Win
+                                                     | otherwise = GameMode (Jogo m (Jogador (x,y) d c))
