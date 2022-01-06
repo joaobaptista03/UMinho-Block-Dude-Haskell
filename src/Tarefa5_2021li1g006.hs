@@ -128,7 +128,7 @@ paraGloss block box door ((p, (x,y)):t) = pictures
 
 -- | Ponto de partida do jogo, que inclui o mapa1.
 jogoinicial :: Jogo 
-jogoinicial = Jogo mapa1 (Jogador (1,9) Este True)
+jogoinicial = Jogo mapa1 (Jogador (1,9) Este False)
 
 -- | A função termina o jogo quando o player chega à porta.
 finishgame :: Float -> Status -> Status

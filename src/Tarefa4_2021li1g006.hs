@@ -67,8 +67,8 @@ andaDirJogador :: Jogador -> Mapa -> Jogador
 andaDirJogador (Jogador (x,y) dir caixa) m
              | x == length (head m) = Jogador (x,y) dir caixa
              | getPeca m (x+1) y == Bloco || getPeca m (x+1) y == Caixa = Jogador (x,y) Este caixa
-             | getPeca m (x+1) y == Porta = if getPeca m (x+1) (y-1) /= Vazio then Jogador (x,y) Este caixa else Jogador (x+1,y) Este caixa
-             | otherwise = if getPeca m (x+1) (y+1) == Bloco || getPeca m (x+1) (y+1) == Caixa then if getPeca m (x+1) (y-1) /= Vazio then Jogador (x,y) Este caixa else Jogador (x+1,y) Este caixa
+             | getPeca m (x+1) y == Porta = if caixa then if getPeca m (x+1) (y-1) /= Vazio then Jogador (x,y) Este caixa else Jogador (x+1,y) Este caixa else Jogador (x+1,y) Este caixa
+             | otherwise = if getPeca m (x+1) (y+1) == Bloco || getPeca m (x+1) (y+1) == Caixa then if caixa then if getPeca m (x+1) (y-1) /= Vazio then Jogador (x,y) Este caixa else Jogador (x+1,y) Este caixa else Jogador (x+1,y) Este caixa
              else if getPeca m (x+1) (y+1) == Porta then Jogador (x+1,y-1) Este caixa
              else andaDirJogador (Jogador (x,y+1) Este caixa) m
 
@@ -84,8 +84,8 @@ andaEsqJogador :: Jogador -> Mapa -> Jogador
 andaEsqJogador (Jogador (x,y) dir caixa) m
              | x == 0 = Jogador (x,y) dir caixa
              | getPeca m (x-1) y == Bloco || getPeca m (x-1) y == Caixa = Jogador (x,y) Oeste caixa
-             | getPeca m (x-1) y == Porta = if getPeca m (x-1) (y-1) /= Vazio then Jogador (x,y) Este caixa else Jogador (x-    1,y) Este caixa
-             | otherwise = if getPeca m (x-1) (y+1) == Bloco || getPeca m (x-1) (y+1) == Caixa then if getPeca m (x-1) (y-1) /= Vazio then Jogador (x,y) Este caixa else Jogador (x-1,y) Este caixa
+             | getPeca m (x-1) y == Porta = if caixa then if getPeca m (x-1) (y-1) /= Vazio then Jogador (x,y) Oeste caixa else Jogador (x-1,y) Oeste caixa else Jogador (x-1,y) Oeste caixa
+             | otherwise = if getPeca m (x-1) (y+1) == Bloco || getPeca m (x-1) (y+1) == Caixa then if caixa then if getPeca m (x-1) (y-1) /= Vazio then Jogador (x,y) Oeste caixa else Jogador (x-1,y) Oeste caixa else Jogador (x-1,y) Oeste caixa
              else if getPeca m (x-1) (y+1) == Porta then Jogador (x-1,y-1) Oeste caixa
              else andaEsqJogador (Jogador (x,y+1) Oeste caixa) m
 
