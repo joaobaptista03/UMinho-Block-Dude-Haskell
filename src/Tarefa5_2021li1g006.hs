@@ -65,7 +65,7 @@ draw logo _ _ _ _ _ _ _ win _ _ Win = Pictures [
                                                                  , translate (-190) (-400) $ color white $ scale 0.2 0.2 $ text "Press ENTER to return to Menu"
                                                                  , translate (-740) 400 $ scale 1 1 logo
                                                                   ]
-draw logo _ _ _ _ _ _ _  _ mar joaopedro (Controller Play) = Pictures [
+draw logo _ _ _ _ _ _ _  _ mar joaopedro (Controller Play) = scale 0.8 0.8 $ Pictures [
                                                                             Color (bright magenta) $ Translate 0 (-100) $ makeButton "Play"
                                                                           , instructionsButton
                                                                           , Translate 0 (-300) $ makeButton "Exit"
@@ -76,7 +76,7 @@ draw logo _ _ _ _ _ _ _  _ mar joaopedro (Controller Play) = Pictures [
                                                                           , translate (-700) 300 joaopedro
                                                                           , translate 700 300 mar
                                                                            ]
-draw logo _ _ _ _ _ _ _  _ mar joaopedro (Controller Instructions) = Pictures [
+draw logo _ _ _ _ _ _ _  _ mar joaopedro (Controller Instructions) = scale 0.8 0.8 $ Pictures [
                                                                             Translate (-300) (-100) $ makeButton "Play"
                                                                           , Translate (-300) 0 $ Color (makeColor 0 0 256 1) instructionsButton
                                                                           , Translate (-300) (-300) $ makeButton "Exit"
@@ -93,7 +93,7 @@ draw logo _ _ _ _ _ _ _  _ mar joaopedro (Controller Instructions) = Pictures [
                                                                           , translate (-700) 300 joaopedro
                                                                           , translate 700 300 mar
                                                                           ]
-draw logo _ _ _ _ _ _ _  _ mar joaopedro (Controller Exit) = Pictures [
+draw logo _ _ _ _ _ _ _  _ mar joaopedro (Controller Exit) = scale 0.8 0.8 $ Pictures [
                                                                            Translate 0 (-100) $ makeButton "Play"
                                                                          , instructionsButton
                                                                          , Color (makeColor 0 212 255 1) $ Translate 0 (-300) $ makeButton "Exit"
@@ -104,7 +104,7 @@ draw logo _ _ _ _ _ _ _  _ mar joaopedro (Controller Exit) = Pictures [
                                                                          , translate (-700) 300 joaopedro
                                                                          , translate 700 300 mar
                                                                           ]
-draw logo block box door playerL playerR playerLC playerRC _ _ _ (GameMode (Jogo m (Jogador (x,y) d c))) = if validaPotencialMapa (desconstroiMapa m) then pictures [
+draw logo block box door playerL playerR playerLC playerRC _ _ _ (GameMode (Jogo m (Jogador (x,y) d c))) = if validaPotencialMapa (desconstroiMapa m) then scale 0.8 0.8 $ pictures [
                                                                                                 translate (-550) 130 $ paraGloss block box door (desconstroiMapa m)
                                                                                               , translate (-550) 130 $ Pictures [
                                                                                                                                 if d == Oeste then Translate (64 * fromIntegral x) ((-64) * fromIntegral y) $ scale 2 2 (if c then playerLC else playerL) else Translate (64 * fromIntegral x) ((-64) * fromIntegral y) $ scale 2 2 (if c then playerRC else playerR)
