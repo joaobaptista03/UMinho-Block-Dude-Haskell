@@ -59,13 +59,13 @@ instructionsButton = pictures
     , translate (-85) (-162) $ scale 0.26 0.26 $ text "Instructions"]
 
 -- | draw é a função que desenha tudo na janela: Menu quando as várias opções estão selecionadas, Modo de Jogo, Estado de Venceu e Página de Instruções.
-draw :: Picture -> Picture -> Picture -> Picture -> Picture -> Picture -> Picture -> Picture -> Picture -> Status -> Picture
-draw logo block box door playerL playerR win mar joaopedro Win = Pictures [
+draw :: Picture -> Picture -> Picture -> Picture -> Picture -> Picture -> Picture -> Picture -> Picture -> Picture -> Picture -> Status -> Picture
+draw logo _ _ _ _ _ _ _ win _ _ Win = Pictures [
                                                                    Translate 20 (-40) $ Color (dark green) $ scale 2 2 win
                                                                  , translate (-190) (-400) $ color white $ scale 0.2 0.2 $ text "Press ENTER to return to Menu"
                                                                  , translate (-740) 400 $ scale 1 1 logo
                                                                   ]
-draw logo block box door playerL playerR win mar joaopedro (Controller Play) = Pictures [
+draw logo _ _ _ _ _ _ _  _ mar joaopedro (Controller Play) = Pictures [
                                                                             Color (bright magenta) $ Translate 0 (-100) $ makeButton "Play"
                                                                           , instructionsButton
                                                                           , Translate 0 (-300) $ makeButton "Exit"
@@ -76,7 +76,7 @@ draw logo block box door playerL playerR win mar joaopedro (Controller Play) = P
                                                                           , translate (-700) 300 joaopedro
                                                                           , translate 700 300 mar
                                                                            ]
-draw logo block box door playerL playerR win mar joaopedro (Controller Instructions) = Pictures [
+draw logo _ _ _ _ _ _ _  _ mar joaopedro (Controller Instructions) = Pictures [
                                                                             Translate (-300) (-100) $ makeButton "Play"
                                                                           , Translate (-300) 0 $ Color (makeColor 0 0 256 1) instructionsButton
                                                                           , Translate (-300) (-300) $ makeButton "Exit"
@@ -93,7 +93,7 @@ draw logo block box door playerL playerR win mar joaopedro (Controller Instructi
                                                                           , translate (-700) 300 joaopedro
                                                                           , translate 700 300 mar
                                                                           ]
-draw logo block box door playerL playerR win mar joaopedro (Controller Exit) = Pictures [
+draw logo _ _ _ _ _ _ _  _ mar joaopedro (Controller Exit) = Pictures [
                                                                            Translate 0 (-100) $ makeButton "Play"
                                                                          , instructionsButton
                                                                          , Color (makeColor 0 212 255 1) $ Translate 0 (-300) $ makeButton "Exit"
@@ -104,10 +104,10 @@ draw logo block box door playerL playerR win mar joaopedro (Controller Exit) = P
                                                                          , translate (-700) 300 joaopedro
                                                                          , translate 700 300 mar
                                                                           ]
-draw logo block box door playerL playerR win mar joaopedro (GameMode (Jogo m (Jogador (x,y) d c))) = pictures [
+draw logo block box door playerL playerR playerLC playerRC _ _ _ (GameMode (Jogo m (Jogador (x,y) d c))) = pictures [
                                                                                                 translate (-550) 130 $ paraGloss block box door (desconstroiMapa m)
                                                                                               , translate (-550) 130 $ Pictures [
-                                                                                                                                if d == Oeste then Translate (64 * fromIntegral x) ((-64) * fromIntegral y) $ scale 2 2 playerL else Translate (64 * fromIntegral x) ((-64) * fromIntegral y) $ scale 2 2 playerR
+                                                                                                                                if d == Oeste then Translate (64 * fromIntegral x) ((-64) * fromIntegral y) $ scale 2 2 (if c then playerLC else playerL) else Translate (64 * fromIntegral x) ((-64) * fromIntegral y) $ scale 2 2 (if c then playerRC else playerR)
                                                                                                                               , if c then translate (64 * fromIntegral x) ((-64) * fromIntegral (y-1)) $ scale 2 2 box else Blank
                                                                                                                                 ]
                                                                                               , color white $ translate 150 385 $ scale 0.2 0.2 $ text "Copyright 2022 - Joao Pedro Baptista & Mariana Pinto"
@@ -191,6 +191,8 @@ main = do
   joaopedro <- loadBMP "imgs/joaopedro.bmp"
   mariana <- loadBMP "imgs/mariana.bmp"
   win <- loadBMP "imgs/YouWin.bmp"
+  playerRC <- loadBMP "imgs/playerRC.bmp"
+  playerLC <- loadBMP "imgs/playerLC.bmp"
   playerL <- loadBMP "imgs/playerL.bmp"
   playerR <- loadBMP "imgs/playerR.bmp"
   box <- loadBMP "imgs/box.bmp"
@@ -203,6 +205,6 @@ main = do
     background
     fr
     estado
-    (draw logo block box door playerL playerR win mariana joaopedro)
+    (draw logo block box door playerL playerR playerLC playerRC win mariana joaopedro)
     event
     finishgame
