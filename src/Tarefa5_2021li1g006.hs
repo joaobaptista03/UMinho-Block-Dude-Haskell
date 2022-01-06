@@ -7,7 +7,7 @@ Copyright   : João Pedro Mota Baptista <a100705@alunos.uminho.pt>;
 Módulo para a realização da Tarefa 5 do projeto de LI1 em 2021/22.
 -}
 
-module Main where
+module Tarefa5_2021li1g006 where
 
 import Graphics.Gloss
 import Graphics.Gloss.Interface.IO.Game
@@ -61,7 +61,8 @@ instructionsButton = pictures
 -- | draw é a função que desenha tudo na janela: Menu quando as várias opções estão selecionadas, Modo de Jogo, Estado de Venceu e Página de Instruções.
 draw :: Picture -> Picture -> Picture -> Picture -> Picture -> Picture -> Picture -> Picture -> Picture -> Status -> Picture
 draw logo block box door playerL playerR win mar joaopedro Win = Pictures [
-                                                                   Translate (-280) (-40) $ Color (dark green) $ translate 300 0 $ scale 2 2 win
+                                                                   Translate 20 (-40) $ Color (dark green) $ scale 2 2 win
+                                                                 , translate (-190) (-400) $ color white $ scale 0.2 0.2 $ text "Press ENTER to return to Menu"
                                                                  , translate (-740) 400 $ scale 1 1 logo
                                                                   ]
 draw logo block box door playerL playerR win mar joaopedro (Controller Play) = Pictures [
@@ -76,9 +77,15 @@ draw logo block box door playerL playerR win mar joaopedro (Controller Play) = P
                                                                           , translate 700 300 mar
                                                                            ]
 draw logo block box door playerL playerR win mar joaopedro (Controller Instructions) = Pictures [
-                                                                            Translate 0 (-100) $ makeButton "Play"
-                                                                          , Color (makeColor 0 0 256 1) instructionsButton
-                                                                          , Translate 0 (-300) $ makeButton "Exit"
+                                                                            Translate (-300) (-100) $ makeButton "Play"
+                                                                          , Translate (-300) 0 $ Color (makeColor 0 0 256 1) instructionsButton
+                                                                          , Translate (-300) (-300) $ makeButton "Exit"
+                                                                          , color white $ translate (-150) (-70) $ scale 0.2 0.2 $ text "Press ' r ' to restart"
+                                                                          , color white $ translate (-150) (-105) $ scale 0.2 0.2 $ text "Press ' m ' to go back to menu"
+                                                                          , color white $ translate (-150) (-140) $ scale 0.2 0.2 $ text "Press ' w ' or keyUp to climb"
+                                                                          , color white $ translate (-150) (-175) $ scale 0.2 0.2 $ text "Press ' a ' or keyLeft to walk left"
+                                                                          , color white $ translate (-150) (-210) $ scale 0.2 0.2 $ text "Press ' s ' or keyDown to carry a box"
+                                                                          , color white $ translate (-150) (-245) $ scale 0.2 0.2 $ text "Press ' d ' or keyRight to walk right"
                                                                           , translate 0 300 $ scale 1 1 logo
                                                                           , color white $ translate (-350) (-520) $ scale 0.2 0.2 $ text "Copyright 2022 - Joao Pedro Baptista & Mariana Pinto"
                                                                           , translate 700 300 $ rectangleSolid 360 360
@@ -97,20 +104,6 @@ draw logo block box door playerL playerR win mar joaopedro (Controller Exit) = P
                                                                          , translate (-700) 300 joaopedro
                                                                          , translate 700 300 mar
                                                                           ]
-draw logo block box door playerL playerR win mar joaopedro Instructionss = pictures [
-                                                                                    translate 0 300 $ scale 1 1 logo
-                                                                                  , color white $ translate (-350) (-520) $ scale 0.2 0.2 $ text "Copyright 2022 - Joao Pedro Baptista & Mariana Pinto"
-                                                                                  , translate 700 300 $ rectangleSolid 360 360
-                                                                                  , translate (-700) 300 $ rectangleSolid 360 360
-                                                                                  , translate (-700) 300 joaopedro
-                                                                                  , translate 700 300 mar
-                                                                                  , color white $ translate (-230) (-35) $ scale 0.2 0.2 $ text "Press ' r ' to restart"
-                                                                                  , color white $ translate (-230) (-70) $ scale 0.2 0.2 $ text "Press ' m ' to go back to menu"
-                                                                                  , color white $ translate (-230) (-105) $ scale 0.2 0.2 $ text "Press ' w ' or keyUp to climb"
-                                                                                  , color white $ translate (-230) (-140) $ scale 0.2 0.2 $ text "Press ' a ' or keyLeft to walk left"
-                                                                                  , color white $ translate (-230) (-175) $ scale 0.2 0.2 $ text "Press ' s ' or keyDown to carry a box"
-                                                                                  , color white $ translate (-230) (-210) $ scale 0.2 0.2 $ text "Press ' d ' or keyRight to walk right"
-                                                                                  ]
 draw logo block box door playerL playerR win mar joaopedro (GameMode (Jogo m (Jogador (x,y) d c))) = pictures [
                                                                                                 translate (-550) 130 $ paraGloss block box door (desconstroiMapa m)
                                                                                               , translate (-550) 130 $ Pictures [
@@ -174,7 +167,6 @@ event (EventKey (SpecialKey KeyUp) Down _ _) (Controller Exit) = Controller Inst
 event (EventKey (SpecialKey KeyDown) Down _ _) (Controller Exit) = Controller Play
 event (EventKey (SpecialKey KeyUp) Down _ _) (Controller Instructions) = Controller Play
 event (EventKey (SpecialKey KeyDown) Down _ _) (Controller Instructions) = Controller Exit
-event (EventKey (SpecialKey KeyEnter) Down _ _) (Controller Instructions) = Instructionss
 event (EventKey (SpecialKey KeyEnter) Down _ _) Instructionss = Controller Play
 event (EventKey (SpecialKey KeyEnter) Down _ _) (Controller Exit) = undefined
 event (EventKey (SpecialKey KeyEnter) Down _ _) Win = Controller Play
@@ -198,11 +190,11 @@ main = do
 
   joaopedro <- loadBMP "imgs/joaopedro.bmp"
   mariana <- loadBMP "imgs/mariana.bmp"
-  win <- loadBMP "imgs/youwin.bmp"
-  playerL <- loadBMP "imgs/playerl.bmp"
-  playerR <- loadBMP "imgs/playerr.bmp"
+  win <- loadBMP "imgs/YouWin.bmp"
+  playerL <- loadBMP "imgs/playerL.bmp"
+  playerR <- loadBMP "imgs/playerR.bmp"
   box <- loadBMP "imgs/box.bmp"
-  logo <- loadBMP "imgs/logo.bmp"
+  logo <- loadBMP "imgs/Logo.bmp"
   block <- loadBMP "imgs/block.bmp"
   door <- loadBMP "imgs/door.bmp"
 
