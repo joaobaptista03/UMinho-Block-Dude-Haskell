@@ -60,7 +60,7 @@ instructionsButton = pictures
 
 -- | draw é a função que desenha tudo na janela: Menu quando as várias opções estão selecionadas, Modo de Jogo (se o mapa for válido pela T1), Estado de Venceu e Página de Instruções.
 draw :: Picture -> Picture -> Picture -> Picture -> Picture -> Picture -> Picture -> Picture -> Picture -> Picture -> Picture -> Status -> Picture
-draw logo _ _ _ _ _ _ _ win _ _ Win = Pictures [
+draw logo _ _ _ _ _ _ _ win _ _ Win = scale 0.8 0.8 $ Pictures [
                                                                    Translate 20 (-40) $ Color (dark green) $ scale 2 2 win
                                                                  , translate (-190) (-400) $ color white $ scale 0.2 0.2 $ text "Press ENTER to return to Menu"
                                                                  , translate (-740) 400 $ scale 1 1 logo
