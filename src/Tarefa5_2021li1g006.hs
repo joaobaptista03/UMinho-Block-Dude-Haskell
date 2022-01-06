@@ -199,7 +199,7 @@ main = do
   door <- loadBMP "imgs/door.bmp"
 
   play 
-    FullScreen
+    window
     background
     fr
     estado
