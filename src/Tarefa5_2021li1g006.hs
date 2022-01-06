@@ -132,8 +132,6 @@ jogoinicial = Jogo mapa1 (Jogador (1,9) Este False)
 
 -- | A função termina o jogo quando o player chega à porta.
 finishgame :: Float -> Status -> Status
-finishgame _ (GameMode (Jogo m (Jogador (x,y) d c))) | snd (saberPorta (desconstroiMapa m)) == (x,y) = Win
-                                                     | otherwise = GameMode (Jogo m (Jogador (x,y) d c))
 finishgame _ o = o
 
 -- | Primeiro mapa do jogo.
@@ -170,15 +168,27 @@ event (EventKey (SpecialKey KeyDown) Down _ _) (Controller Instructions) = Contr
 event (EventKey (SpecialKey KeyEnter) Down _ _) Instructionss = Controller Play
 event (EventKey (SpecialKey KeyEnter) Down _ _) (Controller Exit) = undefined
 event (EventKey (SpecialKey KeyEnter) Down _ _) Win = Controller Play
-event (EventKey (SpecialKey KeyUp) Down _ _) (GameMode (Jogo m (Jogador (x,y) d c))) = GameMode (Jogo m (trepa (Jogador (x,y) d c) m))
+event (EventKey (SpecialKey KeyUp) Down _ _) (GameMode (Jogo m (Jogador (x,y) d c))) | snd (saberPorta (desconstroiMapa m)) == (cordx (Jogo m (trepa (Jogador (x,y) d c) m)),cordy (Jogo m (andaEsqJogador (Jogador (x,y) d c) m))) = Win
+                                                                                     | otherwise = GameMode (Jogo m (trepa (Jogador (x,y) d c) m))
 event (EventKey (SpecialKey KeyDown) Down _ _) (GameMode (Jogo m (Jogador (x,y) d c))) = GameMode (interageCaixa (Jogo m (Jogador (x,y) d c)))
-event (EventKey (SpecialKey KeyLeft) Down _ _) (GameMode (Jogo m (Jogador (x,y) d c))) = GameMode (Jogo m (andaEsqJogador (Jogador (x,y) d c) m))
-event (EventKey (SpecialKey KeyRight) Down _ _) (GameMode (Jogo m (Jogador (x,y) d c))) = GameMode (Jogo m (andaDirJogador (Jogador (x,y) d c) m))
-event (EventKey (Char 'w') Down _ _) (GameMode (Jogo m (Jogador (x,y) d c))) = GameMode (Jogo m (trepa (Jogador (x,y) d c) m))
+event (EventKey (SpecialKey KeyLeft) Down _ _) (GameMode (Jogo m (Jogador (x,y) d c))) | snd (saberPorta (desconstroiMapa m)) == (cordx (Jogo m (andaEsqJogador (Jogador (x,y) d c) m)),cordy (Jogo m (andaEsqJogador (Jogador (x,y) d c) m))) = Win
+                                                                                       | otherwise = GameMode (Jogo m (andaEsqJogador (Jogador (x,y) d c) m))
+event (EventKey (SpecialKey KeyRight) Down _ _) (GameMode (Jogo m (Jogador (x,y) d c))) | snd (saberPorta (desconstroiMapa m)) == (cordx (Jogo m (andaDirJogador (Jogador (x,y) d c) m)),cordy (Jogo m (andaDirJogador (Jogador (x,y) d c) m))) = Win
+                                                                                        | otherwise = GameMode (Jogo m (andaDirJogador (Jogador (x,y) d c) m))
+event (EventKey (Char 'w') Down _ _) (GameMode (Jogo m (Jogador (x,y) d c))) | snd (saberPorta (desconstroiMapa m)) == (cordx (Jogo m (trepa (Jogador (x,y) d c) m)),cordy (Jogo m (andaEsqJogador (Jogador (x,y) d c) m))) = Win
+                                                                             | otherwise = GameMode (Jogo m (trepa (Jogador (x,y) d c) m))
 event (EventKey (Char 's') Down _ _) (GameMode (Jogo m (Jogador (x,y) d c))) = GameMode (interageCaixa (Jogo m (Jogador (x,y) d c)))
-event (EventKey (Char 'a') Down _ _) (GameMode (Jogo m (Jogador (x,y) d c))) = GameMode (Jogo m (andaEsqJogador (Jogador (x,y) d c) m))
-event (EventKey (Char 'd') Down _ _) (GameMode (Jogo m (Jogador (x,y) d c))) = GameMode (Jogo m (andaDirJogador (Jogador (x,y) d c) m))
+event (EventKey (Char 'a') Down _ _) (GameMode (Jogo m (Jogador (x,y) d c))) | snd (saberPorta (desconstroiMapa m)) == (cordx (Jogo m (andaEsqJogador (Jogador (x,y) d c) m)),cordy (Jogo m (andaEsqJogador (Jogador (x,y) d c) m))) = Win
+                                                                             | otherwise = GameMode (Jogo m (andaEsqJogador (Jogador (x,y) d c) m))
+event (EventKey (Char 'd') Down _ _) (GameMode (Jogo m (Jogador (x,y) d c))) | snd (saberPorta (desconstroiMapa m)) == (cordx (Jogo m (andaDirJogador (Jogador (x,y) d c) m)),cordy (Jogo m (andaDirJogador (Jogador (x,y) d c) m))) = Win
+                                                                             | otherwise = GameMode (Jogo m (andaDirJogador (Jogador (x,y) d c) m))
 event _ w = w
+
+cordx :: Jogo -> Int
+cordx (Jogo m (Jogador (x,y) d c)) = x
+
+cordy :: Jogo -> Int
+cordy (Jogo m (Jogador (x,y) d c)) = y
 
 -- | Estado inicial do programa quando ele é aberto, que neste caso é o menu com o botão Play selecionado.
 estado :: Status
