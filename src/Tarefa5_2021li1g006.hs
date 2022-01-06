@@ -26,11 +26,17 @@ data Menu = Controller Options
           | Instructionss
           | Win
 
+-- | Dimensão da janela do jogo.
+
 window :: Display
 window = FullScreen
 
+-- | Cor de fundo.
+
 background :: Color
 background = greyN 0.263
+
+-- | Frames por segundo.
 
 fr :: Int
 fr = 50
@@ -121,8 +127,12 @@ paraGloss block box door ((p, (x,y)):t) = pictures
       i = 64 * fromIntegral x
       j = (-64) * fromIntegral y
 
+-- | Ponto de partida do jogo, que inclui o mapa1.
+
 jogoinicial :: Jogo 
 jogoinicial = Jogo mapa1 (Jogador (1,9) Este False)
+
+-- | Primeiro mapa do jogo.
 
 mapa1 :: Mapa
 mapa1 =         [
@@ -138,6 +148,12 @@ mapa1 =         [
                 , [Bloco, Vazio, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Vazio, Vazio, Vazio, Bloco, Vazio, Vazio, Porta]
                 , [Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco]
                                                                                                                                               ]
+
+-- | A função event transforma cada de input do Jogador na sua respetiva ação/movimento. 
+
+-- |Por exemplo:
+
+-- | Se o jogador clicar no "a" ou no "d", anda, respetivamente, para a esquerda ou direita.
 
 event :: Event -> Menu -> Menu
 event (EventKey (SpecialKey KeyEnter) Down _ _) (Controller Play) = GameMode jogoinicial
