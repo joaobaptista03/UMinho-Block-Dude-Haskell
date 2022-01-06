@@ -22,7 +22,7 @@ data Options = Play
             |  Instructions
             |  Exit
 
--- | Todos os estados possíveis: Controller seguido do data Options (Menu e a opção selecionada), Gamemode seguido do Jogo (Modo de Jogo), Instructionss (Página das instruções), Win (Quando o player ganha)
+-- | Todos os estados possíveis: Controller seguido do data Options (Menu e a opção selecionada), Gamemode seguido do Jogo com a informação dos segundos decorridos guardada (Modo de Jogo), Instructionss (Página das instruções), Win (Quando o player ganha)
 data Status = Controller Options
             | GameMode Jogo Float
             | Instructionss
@@ -38,7 +38,7 @@ background = greyN 0.263
 
 -- | Frames por segundo.
 fr :: Int
-fr = 30
+fr = 60
 
 -- | Esta função cria um botão consoante a string que lhe é dada para criar as opções do menu.
 
@@ -114,7 +114,7 @@ draw logo block box door1 door2 playerL playerR playerLC playerRC _ _ _ (GameMod
                                                                                               , translate (-740) 400 $ scale 1 1 logo
                                                                                                ] else undefined
 
--- | paraGloss traduz as coordenadas da fase 1 para as coordenadas do Gloss e também desenha as peças do jogo, sendo uma função auxiliar da função draw, quando estamos no Modo de Jogo.
+-- | paraGloss traduz as coordenadas da fase 1 para as coordenadas do Gloss e também desenha as peças do jogo, sendo uma função auxiliar da função draw, quando estamos no Modo de Jogo. Para além disso, guarda a informação do Modo de Jogo e alterna a cor da porta de 500 em 500 milissegundos.
 paraGloss :: Picture -> Picture -> Picture -> Picture -> [(Peca, Coordenadas)] -> Status -> Picture
 paraGloss _ _ _ _ [] _ = Blank
 paraGloss block box door1 door2 ((p, (x,y)):t) (GameMode (Jogo m (Jogador (_,_) d c)) n) = pictures 
@@ -131,7 +131,7 @@ paraGloss block box door1 door2 ((p, (x,y)):t) (GameMode (Jogo m (Jogador (_,_) 
 jogoinicial :: Status 
 jogoinicial = GameMode (Jogo mapa1 (Jogador (1,9) Este False)) 0
 
--- | A função termina o jogo quando o player chega à porta.
+-- | A função é responsável por guardar no GameMode o tempo decorrido em segundos (float) para que seja possível alternar a cor da porta de 500 em 500 milissegundos.
 time :: Float -> Status -> Status
 time n (GameMode (Jogo m (Jogador (x,y) d c)) a) = GameMode (Jogo m (Jogador (x,y) d c)) (a+n)
 time _ s = s
@@ -154,7 +154,7 @@ mapa1 =         [
 
 -- | A função event transforma cada de input do Jogador na sua respetiva ação/movimento.
 
--- |Por exemplo:
+-- | Por exemplo:
 
 -- | Se o jogador clicar no "a" ou no "d", anda, respetivamente, para a esquerda ou direita.
 event :: Event -> Status -> Status
@@ -171,19 +171,19 @@ event (EventKey (SpecialKey KeyEnter) Down _ _) Instructionss = Controller Play
 event (EventKey (SpecialKey KeyEnter) Down _ _) (Controller Exit) = undefined
 event (EventKey (SpecialKey KeyEnter) Down _ _) Win = Controller Play
 event (EventKey (SpecialKey KeyUp) Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n) | snd (saberPorta (desconstroiMapa m)) == (cordx (Jogo m (trepa (Jogador (x,y) d c) m)),cordy (Jogo m (andaEsqJogador (Jogador (x,y) d c) m))) = Win
-                                                                                     | otherwise = GameMode (Jogo m (trepa (Jogador (x,y) d c) m)) n
+                                                                                       | otherwise = GameMode (Jogo m (trepa (Jogador (x,y) d c) m)) n
 event (EventKey (SpecialKey KeyDown) Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n) = GameMode (interageCaixa (Jogo m (Jogador (x,y) d c))) n
 event (EventKey (SpecialKey KeyLeft) Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n) | snd (saberPorta (desconstroiMapa m)) == (cordx (Jogo m (andaEsqJogador (Jogador (x,y) d c) m)),cordy (Jogo m (andaEsqJogador (Jogador (x,y) d c) m))) = Win
-                                                                                       | otherwise = GameMode (Jogo m (andaEsqJogador (Jogador (x,y) d c) m)) n
+                                                                                         | otherwise = GameMode (Jogo m (andaEsqJogador (Jogador (x,y) d c) m)) n
 event (EventKey (SpecialKey KeyRight) Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n) | snd (saberPorta (desconstroiMapa m)) == (cordx (Jogo m (andaDirJogador (Jogador (x,y) d c) m)),cordy (Jogo m (andaDirJogador (Jogador (x,y) d c) m))) = Win
-                                                                                        | otherwise = GameMode (Jogo m (andaDirJogador (Jogador (x,y) d c) m)) n
+                                                                                          | otherwise = GameMode (Jogo m (andaDirJogador (Jogador (x,y) d c) m)) n
 event (EventKey (Char 'w') Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n) | snd (saberPorta (desconstroiMapa m)) == (cordx (Jogo m (trepa (Jogador (x,y) d c) m)),cordy (Jogo m (andaEsqJogador (Jogador (x,y) d c) m))) = Win
-                                                                             | otherwise = GameMode (Jogo m (trepa (Jogador (x,y) d c) m)) n
+                                                                               | otherwise = GameMode (Jogo m (trepa (Jogador (x,y) d c) m)) n
 event (EventKey (Char 's') Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n) = GameMode (interageCaixa (Jogo m (Jogador (x,y) d c))) n
 event (EventKey (Char 'a') Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n) | snd (saberPorta (desconstroiMapa m)) == (cordx (Jogo m (andaEsqJogador (Jogador (x,y) d c) m)),cordy (Jogo m (andaEsqJogador (Jogador (x,y) d c) m))) = Win
-                                                                             | otherwise = GameMode (Jogo m (andaEsqJogador (Jogador (x,y) d c) m)) n
+                                                                               | otherwise = GameMode (Jogo m (andaEsqJogador (Jogador (x,y) d c) m)) n
 event (EventKey (Char 'd') Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n) | snd (saberPorta (desconstroiMapa m)) == (cordx (Jogo m (andaDirJogador (Jogador (x,y) d c) m)),cordy (Jogo m (andaDirJogador (Jogador (x,y) d c) m))) = Win
-                                                                             | otherwise = GameMode (Jogo m (andaDirJogador (Jogador (x,y) d c) m)) n
+                                                                               | otherwise = GameMode (Jogo m (andaDirJogador (Jogador (x,y) d c) m)) n
 event _ w = w
 
 
