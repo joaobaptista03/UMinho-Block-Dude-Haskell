@@ -24,7 +24,7 @@ data Options = Play
 
 -- | Todos os estados possíveis: Controller seguido do data Options (Menu e a opção selecionada), Gamemode seguido do Jogo (Modo de Jogo), Instructionss (Página das instruções), Win (Quando o player ganha)
 data Status = Controller Options
-            | GameMode Jogo
+            | GameMode Jogo Float
             | Instructionss
             | Win
 
@@ -59,13 +59,13 @@ instructionsButton = pictures
     , translate (-85) (-162) $ scale 0.26 0.26 $ text "Instructions"]
 
 -- | draw é a função que desenha tudo na janela: Menu quando as várias opções estão selecionadas, Modo de Jogo (se o mapa for válido pela T1), Estado de Venceu e Página de Instruções.
-draw :: Picture -> Picture -> Picture -> Picture -> Picture -> Picture -> Picture -> Picture -> Picture -> Picture -> Picture -> Status -> Picture
-draw logo _ _ _ _ _ _ _ win _ _ Win = scale 0.75 0.75 $ Pictures [
+draw :: Picture -> Picture -> Picture -> Picture -> Picture -> Picture -> Picture -> Picture -> Picture -> Picture -> Picture -> Picture -> Status -> Picture
+draw logo _ _ _ _ _ _ _ _ win _ _ Win = scale 0.75 0.75 $ Pictures [
                                                                    Translate 20 (-40) $ Color (dark green) $ scale 2 2 win
                                                                  , translate (-190) (-400) $ color white $ scale 0.2 0.2 $ text "Press ENTER to return to Menu"
                                                                  , translate (-740) 400 $ scale 1 1 logo
                                                                   ]
-draw logo _ _ _ _ _ _ _  _ mar joaopedro (Controller Play) = scale 0.75 0.75 $ Pictures [
+draw logo _ _ _ _ _ _ _ _  _ mar joaopedro (Controller Play) = scale 0.75 0.75 $ Pictures [
                                                                             Color (bright magenta) $ Translate 0 (-100) $ makeButton "Play"
                                                                           , instructionsButton
                                                                           , Translate 0 (-300) $ makeButton "Exit"
@@ -76,7 +76,7 @@ draw logo _ _ _ _ _ _ _  _ mar joaopedro (Controller Play) = scale 0.75 0.75 $ P
                                                                           , translate (-700) 300 joaopedro
                                                                           , translate 700 300 mar
                                                                            ]
-draw logo _ _ _ _ _ _ _  _ mar joaopedro (Controller Instructions) = scale 0.75 0.75 $ Pictures [
+draw logo _ _ _ _ _ _ _ _  _ mar joaopedro (Controller Instructions) = scale 0.75 0.75 $ Pictures [
                                                                             Translate (-300) (-100) $ makeButton "Play"
                                                                           , Translate (-300) 0 $ Color (makeColor 0 0 256 1) instructionsButton
                                                                           , Translate (-300) (-300) $ makeButton "Exit"
@@ -93,7 +93,7 @@ draw logo _ _ _ _ _ _ _  _ mar joaopedro (Controller Instructions) = scale 0.75 
                                                                           , translate (-700) 300 joaopedro
                                                                           , translate 700 300 mar
                                                                           ]
-draw logo _ _ _ _ _ _ _  _ mar joaopedro (Controller Exit) = scale 0.75 0.75 $ Pictures [
+draw logo _ _ _ _ _ _ _ _  _ mar joaopedro (Controller Exit) = scale 0.75 0.75 $ Pictures [
                                                                            Translate 0 (-100) $ makeButton "Play"
                                                                          , instructionsButton
                                                                          , Color (makeColor 0 212 255 1) $ Translate 0 (-300) $ makeButton "Exit"
@@ -104,8 +104,8 @@ draw logo _ _ _ _ _ _ _  _ mar joaopedro (Controller Exit) = scale 0.75 0.75 $ P
                                                                          , translate (-700) 300 joaopedro
                                                                          , translate 700 300 mar
                                                                           ]
-draw logo block box door playerL playerR playerLC playerRC _ _ _ (GameMode (Jogo m (Jogador (x,y) d c))) = if validaPotencialMapa (desconstroiMapa m) then scale 0.75 0.75 $ pictures [
-                                                                                                translate (-550) 130 $ paraGloss block box door (desconstroiMapa m)
+draw logo block box door1 door2 playerL playerR playerLC playerRC _ _ _ (GameMode (Jogo m (Jogador (x,y) d c)) n) = if validaPotencialMapa (desconstroiMapa m) then scale 0.75 0.75 $ pictures [
+                                                                                                translate (-550) 130 $ paraGloss block box door1 door2 (desconstroiMapa m) (GameMode (Jogo m (Jogador (x,y) d c)) n)
                                                                                               , translate (-550) 130 $ Pictures [
                                                                                                                                 if d == Oeste then Translate (64 * fromIntegral x) ((-64) * fromIntegral y) $ scale 2 2 (if c then playerLC else playerL) else Translate (64 * fromIntegral x) ((-64) * fromIntegral y) $ scale 2 2 (if c then playerRC else playerR)
                                                                                                                               , if c then translate (64 * fromIntegral x) ((-64) * fromIntegral (y-1)) $ scale 2 2 box else Blank
@@ -115,24 +115,26 @@ draw logo block box door playerL playerR playerLC playerRC _ _ _ (GameMode (Jogo
                                                                                                ] else undefined
 
 -- | paraGloss traduz as coordenadas da fase 1 para as coordenadas do Gloss e também desenha as peças do jogo, sendo uma função auxiliar da função draw, quando estamos no Modo de Jogo.
-paraGloss :: Picture -> Picture -> Picture -> [(Peca, Coordenadas)] -> Picture
-paraGloss _ _ _ [] = Blank
-paraGloss block box door ((p, (x,y)):t) = pictures 
+paraGloss :: Picture -> Picture -> Picture -> Picture -> [(Peca, Coordenadas)] -> Status -> Picture
+paraGloss _ _ _ _ [] _ = Blank
+paraGloss block box door1 door2 ((p, (x,y)):t) (GameMode (Jogo m (Jogador (_,_) d c)) n) = pictures 
                                                       [
-                                                        translate i j $ scale 2 2 (if p == Bloco then block else if p == Caixa then box else door)
-                                                      , paraGloss block box door t
+                                                        translate i j $ scale 2 2 (if p == Bloco then block else if p == Caixa then box else if mod (round (n*1000)) 1000 < 500 then door1 else door2)
+                                                      , paraGloss block box door1 door2 t (GameMode (Jogo m (Jogador (x,y) d c)) n)
                                                       ]
+
     where
       i = 64 * fromIntegral x
       j = (-64) * fromIntegral y
 
 -- | Ponto de partida do jogo, que inclui o mapa1.
-jogoinicial :: Jogo 
-jogoinicial = Jogo mapa1 (Jogador (1,9) Este False)
+jogoinicial :: Status 
+jogoinicial = GameMode (Jogo mapa1 (Jogador (1,9) Este False)) 0
 
 -- | A função termina o jogo quando o player chega à porta.
-finishgame :: Float -> Status -> Status
-finishgame _ o = o
+time :: Float -> Status -> Status
+time n (GameMode (Jogo m (Jogador (x,y) d c)) a) = GameMode (Jogo m (Jogador (x,y) d c)) (a+n)
+time _ s = s
 
 -- | Primeiro mapa do jogo.
 mapa1 :: Mapa
@@ -156,8 +158,8 @@ mapa1 =         [
 
 -- | Se o jogador clicar no "a" ou no "d", anda, respetivamente, para a esquerda ou direita.
 event :: Event -> Status -> Status
-event (EventKey (SpecialKey KeyEnter) Down _ _) (Controller Play) = GameMode jogoinicial
-event (EventKey (Char 'r') Down _ _) (GameMode _) = GameMode jogoinicial
+event (EventKey (SpecialKey KeyEnter) Down _ _) (Controller Play) = jogoinicial
+event (EventKey (Char 'r') Down _ _) (GameMode _ _) = jogoinicial
 event (EventKey (Char 'm') Down _ _) _ = Controller Play
 event (EventKey (SpecialKey KeyUp) Down _ _) (Controller Play) = Controller Exit
 event (EventKey (SpecialKey KeyDown) Down _ _) (Controller Play) = Controller Instructions
@@ -168,25 +170,28 @@ event (EventKey (SpecialKey KeyDown) Down _ _) (Controller Instructions) = Contr
 event (EventKey (SpecialKey KeyEnter) Down _ _) Instructionss = Controller Play
 event (EventKey (SpecialKey KeyEnter) Down _ _) (Controller Exit) = undefined
 event (EventKey (SpecialKey KeyEnter) Down _ _) Win = Controller Play
-event (EventKey (SpecialKey KeyUp) Down _ _) (GameMode (Jogo m (Jogador (x,y) d c))) | snd (saberPorta (desconstroiMapa m)) == (cordx (Jogo m (trepa (Jogador (x,y) d c) m)),cordy (Jogo m (andaEsqJogador (Jogador (x,y) d c) m))) = Win
-                                                                                     | otherwise = GameMode (Jogo m (trepa (Jogador (x,y) d c) m))
-event (EventKey (SpecialKey KeyDown) Down _ _) (GameMode (Jogo m (Jogador (x,y) d c))) = GameMode (interageCaixa (Jogo m (Jogador (x,y) d c)))
-event (EventKey (SpecialKey KeyLeft) Down _ _) (GameMode (Jogo m (Jogador (x,y) d c))) | snd (saberPorta (desconstroiMapa m)) == (cordx (Jogo m (andaEsqJogador (Jogador (x,y) d c) m)),cordy (Jogo m (andaEsqJogador (Jogador (x,y) d c) m))) = Win
-                                                                                       | otherwise = GameMode (Jogo m (andaEsqJogador (Jogador (x,y) d c) m))
-event (EventKey (SpecialKey KeyRight) Down _ _) (GameMode (Jogo m (Jogador (x,y) d c))) | snd (saberPorta (desconstroiMapa m)) == (cordx (Jogo m (andaDirJogador (Jogador (x,y) d c) m)),cordy (Jogo m (andaDirJogador (Jogador (x,y) d c) m))) = Win
-                                                                                        | otherwise = GameMode (Jogo m (andaDirJogador (Jogador (x,y) d c) m))
-event (EventKey (Char 'w') Down _ _) (GameMode (Jogo m (Jogador (x,y) d c))) | snd (saberPorta (desconstroiMapa m)) == (cordx (Jogo m (trepa (Jogador (x,y) d c) m)),cordy (Jogo m (andaEsqJogador (Jogador (x,y) d c) m))) = Win
-                                                                             | otherwise = GameMode (Jogo m (trepa (Jogador (x,y) d c) m))
-event (EventKey (Char 's') Down _ _) (GameMode (Jogo m (Jogador (x,y) d c))) = GameMode (interageCaixa (Jogo m (Jogador (x,y) d c)))
-event (EventKey (Char 'a') Down _ _) (GameMode (Jogo m (Jogador (x,y) d c))) | snd (saberPorta (desconstroiMapa m)) == (cordx (Jogo m (andaEsqJogador (Jogador (x,y) d c) m)),cordy (Jogo m (andaEsqJogador (Jogador (x,y) d c) m))) = Win
-                                                                             | otherwise = GameMode (Jogo m (andaEsqJogador (Jogador (x,y) d c) m))
-event (EventKey (Char 'd') Down _ _) (GameMode (Jogo m (Jogador (x,y) d c))) | snd (saberPorta (desconstroiMapa m)) == (cordx (Jogo m (andaDirJogador (Jogador (x,y) d c) m)),cordy (Jogo m (andaDirJogador (Jogador (x,y) d c) m))) = Win
-                                                                             | otherwise = GameMode (Jogo m (andaDirJogador (Jogador (x,y) d c) m))
+event (EventKey (SpecialKey KeyUp) Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n) | snd (saberPorta (desconstroiMapa m)) == (cordx (Jogo m (trepa (Jogador (x,y) d c) m)),cordy (Jogo m (andaEsqJogador (Jogador (x,y) d c) m))) = Win
+                                                                                     | otherwise = GameMode (Jogo m (trepa (Jogador (x,y) d c) m)) n
+event (EventKey (SpecialKey KeyDown) Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n) = GameMode (interageCaixa (Jogo m (Jogador (x,y) d c))) n
+event (EventKey (SpecialKey KeyLeft) Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n) | snd (saberPorta (desconstroiMapa m)) == (cordx (Jogo m (andaEsqJogador (Jogador (x,y) d c) m)),cordy (Jogo m (andaEsqJogador (Jogador (x,y) d c) m))) = Win
+                                                                                       | otherwise = GameMode (Jogo m (andaEsqJogador (Jogador (x,y) d c) m)) n
+event (EventKey (SpecialKey KeyRight) Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n) | snd (saberPorta (desconstroiMapa m)) == (cordx (Jogo m (andaDirJogador (Jogador (x,y) d c) m)),cordy (Jogo m (andaDirJogador (Jogador (x,y) d c) m))) = Win
+                                                                                        | otherwise = GameMode (Jogo m (andaDirJogador (Jogador (x,y) d c) m)) n
+event (EventKey (Char 'w') Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n) | snd (saberPorta (desconstroiMapa m)) == (cordx (Jogo m (trepa (Jogador (x,y) d c) m)),cordy (Jogo m (andaEsqJogador (Jogador (x,y) d c) m))) = Win
+                                                                             | otherwise = GameMode (Jogo m (trepa (Jogador (x,y) d c) m)) n
+event (EventKey (Char 's') Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n) = GameMode (interageCaixa (Jogo m (Jogador (x,y) d c))) n
+event (EventKey (Char 'a') Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n) | snd (saberPorta (desconstroiMapa m)) == (cordx (Jogo m (andaEsqJogador (Jogador (x,y) d c) m)),cordy (Jogo m (andaEsqJogador (Jogador (x,y) d c) m))) = Win
+                                                                             | otherwise = GameMode (Jogo m (andaEsqJogador (Jogador (x,y) d c) m)) n
+event (EventKey (Char 'd') Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n) | snd (saberPorta (desconstroiMapa m)) == (cordx (Jogo m (andaDirJogador (Jogador (x,y) d c) m)),cordy (Jogo m (andaDirJogador (Jogador (x,y) d c) m))) = Win
+                                                                             | otherwise = GameMode (Jogo m (andaDirJogador (Jogador (x,y) d c) m)) n
 event _ w = w
 
+
+-- | Esta função retorna a coordenada x do player do jogo dado.
 cordx :: Jogo -> Int
 cordx (Jogo m (Jogador (x,y) d c)) = x
 
+-- | Esta função retorna a coordenada y do player do jogo dado.
 cordy :: Jogo -> Int
 cordy (Jogo m (Jogador (x,y) d c)) = y
 
@@ -208,13 +213,14 @@ main = do
   box <- loadBMP "imgs/box.bmp"
   logo <- loadBMP "imgs/Logo.bmp"
   block <- loadBMP "imgs/block.bmp"
-  door <- loadBMP "imgs/door.bmp"
+  door1 <- loadBMP "imgs/door1.bmp"
+  door2 <- loadBMP "imgs/door2.bmp"
 
   play 
     window
     background
     fr
     estado
-    (draw logo block box door playerL playerR playerLC playerRC win mariana joaopedro)
+    (draw logo block box door1 door2 playerL playerR playerLC playerRC win mariana joaopedro)
     event
-    finishgame
+    time
