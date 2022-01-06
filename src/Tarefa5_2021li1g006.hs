@@ -48,7 +48,6 @@ instructionsButton = pictures
     , translate (-85) (-162) $ scale 0.26 0.26 $ text "Instructions"]
 
 
-
 draw :: Picture -> Picture -> Picture -> Picture -> Picture -> Picture -> Picture -> Picture -> Picture -> Menu -> Picture
 draw logo block box door playerL playerR win mar joaopedro Win = Pictures [
                                                                    Translate (-280) (-40) $ Color (dark green) $ translate 300 0 $ scale 2 2 win
@@ -138,7 +137,7 @@ mapa1 =         [
                 , [Bloco, Vazio, Vazio, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Vazio, Vazio, Vazio, Vazio, Bloco, Vazio, Vazio, Bloco]
                 , [Bloco, Vazio, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Vazio, Vazio, Vazio, Bloco, Vazio, Vazio, Porta]
                 , [Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco]
-                                                                                                                                               ]
+                                                                                                                                              ]
 
 event :: Event -> Menu -> Menu
 event (EventKey (SpecialKey KeyEnter) Down _ _) (Controller Play) = GameMode jogoinicial
@@ -192,6 +191,8 @@ main = do
     event
     time
 
+
+-- |A função termina o jogo quando o player chega à porta.
 
 finishgame :: Float -> Menu -> Menu
 finishgame _ (GameMode (Jogo m (Jogador (x,y) d c))) | snd (saberPorta (desconstroiMapa m)) == (x,y) = Win
