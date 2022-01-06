@@ -58,7 +58,7 @@ instructionsButton = pictures
     , translate 0 (-150) $ color (greyN 0.8) $ rectangleSolid 200 50
     , translate (-85) (-162) $ scale 0.26 0.26 $ text "Instructions"]
 
--- | draw é a função que desenha tudo na janela: Menu quando as várias opções estão selecionadas, Modo de Jogo, Estado de Venceu e Página de Instruções.
+-- | draw é a função que desenha tudo na janela: Menu quando as várias opções estão selecionadas, Modo de Jogo (se o mapa for válido pela T1), Estado de Venceu e Página de Instruções.
 draw :: Picture -> Picture -> Picture -> Picture -> Picture -> Picture -> Picture -> Picture -> Picture -> Picture -> Picture -> Status -> Picture
 draw logo _ _ _ _ _ _ _ win _ _ Win = Pictures [
                                                                    Translate 20 (-40) $ Color (dark green) $ scale 2 2 win
@@ -104,7 +104,7 @@ draw logo _ _ _ _ _ _ _  _ mar joaopedro (Controller Exit) = Pictures [
                                                                          , translate (-700) 300 joaopedro
                                                                          , translate 700 300 mar
                                                                           ]
-draw logo block box door playerL playerR playerLC playerRC _ _ _ (GameMode (Jogo m (Jogador (x,y) d c))) = pictures [
+draw logo block box door playerL playerR playerLC playerRC _ _ _ (GameMode (Jogo m (Jogador (x,y) d c))) = if validaPotencialMapa (desconstroiMapa m) then pictures [
                                                                                                 translate (-550) 130 $ paraGloss block box door (desconstroiMapa m)
                                                                                               , translate (-550) 130 $ Pictures [
                                                                                                                                 if d == Oeste then Translate (64 * fromIntegral x) ((-64) * fromIntegral y) $ scale 2 2 (if c then playerLC else playerL) else Translate (64 * fromIntegral x) ((-64) * fromIntegral y) $ scale 2 2 (if c then playerRC else playerR)
@@ -112,7 +112,7 @@ draw logo block box door playerL playerR playerLC playerRC _ _ _ (GameMode (Jogo
                                                                                                                                 ]
                                                                                               , color white $ translate 150 385 $ scale 0.2 0.2 $ text "Copyright 2022 - Joao Pedro Baptista & Mariana Pinto"
                                                                                               , translate (-740) 400 $ scale 1 1 logo
-                                                                                               ]
+                                                                                               ] else undefined
 
 -- | paraGloss traduz as coordenadas da fase 1 para as coordenadas do Gloss e também desenha as peças do jogo, sendo uma função auxiliar da função draw, quando estamos no Modo de Jogo.
 paraGloss :: Picture -> Picture -> Picture -> [(Peca, Coordenadas)] -> Picture
@@ -128,7 +128,7 @@ paraGloss block box door ((p, (x,y)):t) = pictures
 
 -- | Ponto de partida do jogo, que inclui o mapa1.
 jogoinicial :: Jogo 
-jogoinicial = Jogo mapa1 (Jogador (1,9) Este False)
+jogoinicial = Jogo mapa1 (Jogador (1,9) Este True)
 
 -- | A função termina o jogo quando o player chega à porta.
 finishgame :: Float -> Status -> Status
@@ -143,12 +143,12 @@ mapa1 =         [
                 , [Bloco, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Bloco]
                 , [Bloco, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Bloco]
                 , [Bloco, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Bloco]
-                , [Bloco, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Bloco]
-                , [Bloco, Vazio, Vazio, Vazio, Vazio, Vazio, Caixa, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Bloco]
+                , [Bloco, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Caixa, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Bloco]
+                , [Bloco, Vazio, Vazio, Vazio, Vazio, Vazio, Bloco, Bloco, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Bloco]
                 , [Bloco, Vazio, Vazio, Vazio, Vazio, Bloco, Bloco, Bloco, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Bloco]
                 , [Bloco, Vazio, Vazio, Vazio, Bloco, Bloco, Bloco, Bloco, Bloco, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Bloco]
                 , [Bloco, Vazio, Vazio, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Vazio, Vazio, Vazio, Vazio, Bloco, Vazio, Vazio, Bloco]
-                , [Bloco, Vazio, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Vazio, Vazio, Vazio, Bloco, Vazio, Vazio, Porta]
+                , [Bloco, Vazio, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Porta]
                 , [Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco]
                                                                                                                                               ]
 
