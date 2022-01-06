@@ -17,7 +17,7 @@ import Tarefa3_2021li1g006
 import Tarefa4_2021li1g006
 import LI12122
 
--- | Opções do mnu: Play, Instructions e Exit.
+-- | Opções do menu: Play, Instructions e Exit.
 data Options = Play
             |  Instructions
             |  Exit
