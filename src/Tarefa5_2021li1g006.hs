@@ -24,9 +24,9 @@ data Options = Play
 
 -- | Todos os estados possíveis: Controller seguido do data Options (Menu e a opção selecionada), Gamemode seguido do Jogo com a informação dos segundos decorridos guardada (Modo de Jogo), Instructionss (Página das instruções), Win (Quando o player ganha)
 data Status = Controller Options
-            | GameMode Jogo Float
+            | GameMode Jogo Float Int
             | Instructionss
-            | Win
+            | Win Int
 
 -- | Janela do jogo, que neste caso é Fullscreen.
 window :: Display
@@ -60,10 +60,12 @@ instructionsButton = pictures
 
 -- | draw é a função que desenha tudo na janela: Menu quando as várias opções estão selecionadas, Modo de Jogo (se o mapa for válido pela T1), Estado de Venceu e Página de Instruções.
 draw :: Picture -> Picture -> Picture -> Picture -> Picture -> Picture -> Picture -> Picture -> Picture -> Picture -> Picture -> Picture -> Status -> Picture
-draw logo _ _ _ _ _ _ _ _ win _ _ Win = scale 0.75 0.75 $ Pictures [
-                                                                   Translate 20 (-40) $ Color (dark green) $ scale 2 2 win
+draw logo _ _ _ _ _ _ _ _ win _ _ (Win a) = scale 0.75 0.75 $ Pictures [
+                                                                   Translate 20 (-70) $ Color (dark green) $ scale 2 2 win
                                                                  , translate (-190) (-400) $ color white $ scale 0.2 0.2 $ text "Press ENTER to return to Menu"
                                                                  , translate (-740) 400 $ scale 1 1 logo
+                                                                 , color white $ translate 150 385 $ scale 0.2 0.2 $ text "Copyright 2022 - Joao Pedro Baptista & Mariana Pinto"
+                                                                 , color white $ translate (-320) 210 $ scale 0.5 0.5 $ text $ "You took " ++ show a ++ " seconds!"
                                                                   ]
 draw logo _ _ _ _ _ _ _ _  _ mar joaopedro (Controller Play) = scale 0.75 0.75 $ Pictures [
                                                                             Color (bright magenta) $ Translate 0 (-100) $ makeButton "Play"
@@ -104,36 +106,57 @@ draw logo _ _ _ _ _ _ _ _  _ mar joaopedro (Controller Exit) = scale 0.75 0.75 $
                                                                          , translate (-700) 300 joaopedro
                                                                          , translate 700 300 mar
                                                                           ]
-draw logo block box door1 door2 playerL playerR playerLC playerRC _ _ _ (GameMode (Jogo m (Jogador (x,y) d c)) n) = if validaPotencialMapa (desconstroiMapa m) then scale 0.75 0.75 $ pictures [
-                                                                                                translate (-550) 130 $ paraGloss block box door1 door2 (desconstroiMapa m) (GameMode (Jogo m (Jogador (x,y) d c)) n)
+draw logo block box door1 door2 playerL playerR playerLC playerRC _ _ _ (GameMode (Jogo m (Jogador (x,y) d c)) n l) = if validaPotencialMapa (desconstroiMapa m) then scale 0.75 0.75 $ pictures [
+                                                                                                translate (-550) 130 $ paraGloss block box door1 door2 (desconstroiMapa m) (GameMode (Jogo m (Jogador (x,y) d c)) n l)
                                                                                               , translate (-550) 130 $ Pictures [
                                                                                                                                 if d == Oeste then Translate (64 * fromIntegral x) ((-64) * fromIntegral y) $ scale 2 2 (if c then playerLC else playerL) else Translate (64 * fromIntegral x) ((-64) * fromIntegral y) $ scale 2 2 (if c then playerRC else playerR)
                                                                                                                               , if c then translate (64 * fromIntegral x) ((-64) * fromIntegral (y-1)) $ scale 2 2 box else Blank
                                                                                                                                 ]
                                                                                               , color white $ translate 150 385 $ scale 0.2 0.2 $ text "Copyright 2022 - Joao Pedro Baptista & Mariana Pinto"
                                                                                               , translate (-740) 400 $ scale 1 1 logo
+                                                                                              , color white $ translate (-400) 200 $ scale 0.5 0.5 $ text (show l) 
+                                                                                              , color white $ translate (-401) 200 $ scale 0.5 0.5 $ text (show l)
+                                                                                              , color white $ translate (-399) 200 $ scale 0.5 0.5 $ text (show l) 
+                                                                                              , color white $ translate (-400) 201 $ scale 0.5 0.5 $ text (show l) 
+                                                                                              , color white $ translate (-400) 199 $ scale 0.5 0.5 $ text (show l) 
+                                                                                              , color white $ translate (-401) 201 $ scale 0.5 0.5 $ text (show l) 
+                                                                                              , color white $ translate (-401) 199 $ scale 0.5 0.5 $ text (show l)
+                                                                                              , color white $ translate (-399) 199 $ scale 0.5 0.5 $ text (show l) 
+                                                                                              , color white $ translate (-399) 201 $ scale 0.5 0.5 $ text (show l)
+                                                                                              , color white $ translate 349 200 $ scale 0.5 0.5 $ text (show (round(n)))
+                                                                                              , color white $ translate 351 200 $ scale 0.5 0.5 $ text (show (round(n)))
+                                                                                              , color white $ translate 349 199 $ scale 0.5 0.5 $ text (show (round(n)))
+                                                                                              , color white $ translate 351 199 $ scale 0.5 0.5 $ text (show (round(n)))
+                                                                                              , color white $ translate 349 201 $ scale 0.5 0.5 $ text (show (round(n)))
+                                                                                              , color white $ translate 351 201 $ scale 0.5 0.5 $ text (show (round(n)))
+                                                                                              , color white $ translate 350 200 $ scale 0.5 0.5 $ text (show (round(n)))
+                                                                                              , color white $ translate 350 201 $ scale 0.5 0.5 $ text (show (round(n)))
+                                                                                              , color white $ translate 350 199 $ scale 0.5 0.5 $ text (show (round(n)))
                                                                                                ] else undefined
 
 -- | paraGloss traduz as coordenadas da fase 1 para as coordenadas do Gloss e também desenha as peças do jogo, sendo uma função auxiliar da função draw, quando estamos no Modo de Jogo. Para além disso, guarda a informação do Modo de Jogo e alterna a cor da porta de 500 em 500 milissegundos.
 paraGloss :: Picture -> Picture -> Picture -> Picture -> [(Peca, Coordenadas)] -> Status -> Picture
 paraGloss _ _ _ _ [] _ = Blank
-paraGloss block box door1 door2 ((p, (x,y)):t) (GameMode (Jogo m (Jogador (_,_) d c)) n) = pictures 
+paraGloss block box door1 door2 ((p, (x,y)):t) (GameMode (Jogo m (Jogador (_,_) d c)) n l) = pictures 
                                                       [
                                                         translate i j $ scale 2 2 (if p == Bloco then block else if p == Caixa then box else if mod (round (n*1000)) 1000 < 500 then door1 else door2)
-                                                      , paraGloss block box door1 door2 t (GameMode (Jogo m (Jogador (x,y) d c)) n)
+                                                      , paraGloss block box door1 door2 t (GameMode (Jogo m (Jogador (x,y) d c)) n l)
                                                       ]
 
     where
       i = 64 * fromIntegral x
       j = (-64) * fromIntegral y
 
--- | Ponto de partida do jogo, que inclui o mapa1.
-jogoinicial :: Status 
-jogoinicial = GameMode (Jogo mapa1 (Jogador (1,9) Este False)) 0
+-- | Ponto de partida do jogo, que inclui o mapa1, mapa2 e o tempo de jogo decorrido consoante as variáveis inseridas.
+jogoinicial :: Float -> Int -> Status 
+jogoinicial t l | l == 1 = GameMode (Jogo mapa1 (Jogador (1,9) Este False)) 0 1
+                | l == 2 = GameMode (Jogo mapa2 (Jogador (1,9) Este False)) t 2
+                | otherwise = undefined
+
 
 -- | A função é responsável por guardar no GameMode o tempo decorrido em segundos (float) para que seja possível alternar a cor da porta de 500 em 500 milissegundos.
 time :: Float -> Status -> Status
-time n (GameMode (Jogo m (Jogador (x,y) d c)) a) = GameMode (Jogo m (Jogador (x,y) d c)) (a+n)
+time n (GameMode (Jogo m (Jogador (x,y) d c)) a l) = GameMode (Jogo m (Jogador (x,y) d c)) (a+n) l
 time _ s = s
 
 -- | Primeiro mapa do jogo.
@@ -152,14 +175,30 @@ mapa1 =         [
                 , [Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco]
                                                                                                                                               ]
 
+-- | Segundo mapa do jogo.
+mapa2 :: Mapa
+mapa2 =         [
+                  [Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco]
+                , [Bloco, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Bloco]
+                , [Bloco, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Bloco]
+                , [Bloco, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Bloco]
+                , [Bloco, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Bloco]
+                , [Bloco, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Bloco]
+                , [Bloco, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Bloco]
+                , [Bloco, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Bloco]
+                , [Bloco, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Bloco]
+                , [Bloco, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Porta]
+                , [Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco]
+                                                                                                                                              ]
+
 -- | A função event transforma cada de input do Jogador na sua respetiva ação/movimento.
 
 -- | Por exemplo:
 
 -- | Se o jogador clicar no "a" ou no "d", anda, respetivamente, para a esquerda ou direita.
 event :: Event -> Status -> Status
-event (EventKey (SpecialKey KeyEnter) Down _ _) (Controller Play) = jogoinicial
-event (EventKey (Char 'r') Down _ _) (GameMode _ _) = jogoinicial
+event (EventKey (SpecialKey KeyEnter) Down _ _) (Controller Play) = jogoinicial 0 1
+event (EventKey (Char 'r') Down _ _) (GameMode _ _ l) = jogoinicial 0 1
 event (EventKey (Char 'm') Down _ _) _ = Controller Play
 event (EventKey (SpecialKey KeyUp) Down _ _) (Controller Play) = Controller Exit
 event (EventKey (SpecialKey KeyDown) Down _ _) (Controller Play) = Controller Instructions
@@ -169,21 +208,21 @@ event (EventKey (SpecialKey KeyUp) Down _ _) (Controller Instructions) = Control
 event (EventKey (SpecialKey KeyDown) Down _ _) (Controller Instructions) = Controller Exit
 event (EventKey (SpecialKey KeyEnter) Down _ _) Instructionss = Controller Play
 event (EventKey (SpecialKey KeyEnter) Down _ _) (Controller Exit) = undefined
-event (EventKey (SpecialKey KeyEnter) Down _ _) Win = Controller Play
-event (EventKey (SpecialKey KeyUp) Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n) | snd (saberPorta (desconstroiMapa m)) == (cordx (Jogo m (trepa (Jogador (x,y) d c) m)),cordy (Jogo m (andaEsqJogador (Jogador (x,y) d c) m))) = Win
-                                                                                       | otherwise = GameMode (Jogo m (trepa (Jogador (x,y) d c) m)) n
-event (EventKey (SpecialKey KeyDown) Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n) = GameMode (interageCaixa (Jogo m (Jogador (x,y) d c))) n
-event (EventKey (SpecialKey KeyLeft) Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n) | snd (saberPorta (desconstroiMapa m)) == (cordx (Jogo m (andaEsqJogador (Jogador (x,y) d c) m)),cordy (Jogo m (andaEsqJogador (Jogador (x,y) d c) m))) = Win
-                                                                                         | otherwise = GameMode (Jogo m (andaEsqJogador (Jogador (x,y) d c) m)) n
-event (EventKey (SpecialKey KeyRight) Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n) | snd (saberPorta (desconstroiMapa m)) == (cordx (Jogo m (andaDirJogador (Jogador (x,y) d c) m)),cordy (Jogo m (andaDirJogador (Jogador (x,y) d c) m))) = Win
-                                                                                          | otherwise = GameMode (Jogo m (andaDirJogador (Jogador (x,y) d c) m)) n
-event (EventKey (Char 'w') Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n) | snd (saberPorta (desconstroiMapa m)) == (cordx (Jogo m (trepa (Jogador (x,y) d c) m)),cordy (Jogo m (andaEsqJogador (Jogador (x,y) d c) m))) = Win
-                                                                               | otherwise = GameMode (Jogo m (trepa (Jogador (x,y) d c) m)) n
-event (EventKey (Char 's') Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n) = GameMode (interageCaixa (Jogo m (Jogador (x,y) d c))) n
-event (EventKey (Char 'a') Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n) | snd (saberPorta (desconstroiMapa m)) == (cordx (Jogo m (andaEsqJogador (Jogador (x,y) d c) m)),cordy (Jogo m (andaEsqJogador (Jogador (x,y) d c) m))) = Win
-                                                                               | otherwise = GameMode (Jogo m (andaEsqJogador (Jogador (x,y) d c) m)) n
-event (EventKey (Char 'd') Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n) | snd (saberPorta (desconstroiMapa m)) == (cordx (Jogo m (andaDirJogador (Jogador (x,y) d c) m)),cordy (Jogo m (andaDirJogador (Jogador (x,y) d c) m))) = Win
-                                                                               | otherwise = GameMode (Jogo m (andaDirJogador (Jogador (x,y) d c) m)) n
+event (EventKey (SpecialKey KeyEnter) Down _ _) (Win a) = Controller Play
+event (EventKey (SpecialKey KeyUp) Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n l) | snd (saberPorta (desconstroiMapa m)) == (cordx (Jogo m (trepa (Jogador (x,y) d c) m)),cordy (Jogo m (andaEsqJogador (Jogador (x,y) d c) m))) = if l == 2 then Win (round(n)) else jogoinicial n (l+1)
+                                                                                         | otherwise = GameMode (Jogo m (trepa (Jogador (x,y) d c) m)) n l
+event (EventKey (SpecialKey KeyDown) Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n l) = GameMode (interageCaixa (Jogo m (Jogador (x,y) d c))) n l
+event (EventKey (SpecialKey KeyLeft) Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n l) | snd (saberPorta (desconstroiMapa m)) == (cordx (Jogo m (andaEsqJogador (Jogador (x,y) d c) m)),cordy (Jogo m (andaEsqJogador (Jogador (x,y) d c) m))) = if l == 2 then Win (round(n)) else jogoinicial n (l+1)
+                                                                                           | otherwise = GameMode (Jogo m (andaEsqJogador (Jogador (x,y) d c) m)) n l
+event (EventKey (SpecialKey KeyRight) Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n l) | snd (saberPorta (desconstroiMapa m)) == (cordx (Jogo m (andaDirJogador (Jogador (x,y) d c) m)),cordy (Jogo m (andaDirJogador (Jogador (x,y) d c) m))) = if l == 2 then Win (round(n)) else jogoinicial n (l+1)
+                                                                                            | otherwise = GameMode (Jogo m (andaDirJogador (Jogador (x,y) d c) m)) n l
+event (EventKey (Char 'w') Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n l) | snd (saberPorta (desconstroiMapa m)) == (cordx (Jogo m (trepa (Jogador (x,y) d c) m)),cordy (Jogo m (andaEsqJogador (Jogador (x,y) d c) m))) = if l == 2 then Win (round(n)) else jogoinicial n (l+1)
+                                                                                 | otherwise = GameMode (Jogo m (trepa (Jogador (x,y) d c) m)) n l
+event (EventKey (Char 's') Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n l) = GameMode (interageCaixa (Jogo m (Jogador (x,y) d c))) n l
+event (EventKey (Char 'a') Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n l) | snd (saberPorta (desconstroiMapa m)) == (cordx (Jogo m (andaEsqJogador (Jogador (x,y) d c) m)),cordy (Jogo m (andaEsqJogador (Jogador (x,y) d c) m))) = if l == 2 then Win (round(n)) else jogoinicial n (l+1)
+                                                                                 | otherwise = GameMode (Jogo m (andaEsqJogador (Jogador (x,y) d c) m)) n l
+event (EventKey (Char 'd') Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n l) | snd (saberPorta (desconstroiMapa m)) == (cordx (Jogo m (andaDirJogador (Jogador (x,y) d c) m)),cordy (Jogo m (andaDirJogador (Jogador (x,y) d c) m))) = if l == 2 then Win (round(n)) else jogoinicial n (l+1)
+                                                                                 | otherwise = GameMode (Jogo m (andaDirJogador (Jogador (x,y) d c) m)) n l
 event _ w = w
 
 
