@@ -87,7 +87,7 @@ esvaziarateaux (p,(x,y)) = if x >= 0 then (Vazio,(x,y)) : esvaziarateaux (Vazio,
 
 -- |juntar [(Bloco,(1,1)),(Bloco,(3,2))] (crescente [(Bloco,(1,1)),(Bloco,(3,2))]) = [(Vazio,(0,0)),(Vazio,(1,0)),(Vazio,(2,0)),(Vazio,(3,0)),(Vazio,(0,1)),(Bloco,(1,1)),(Vazio,(2,1)),(Vazio,(3,1)),(Vazio,(0,2)),(Vazio,(1,2)),(Vazio,(2,2)),(Bloco,(3,2))]
 juntar :: [(Peca, Coordenadas)] -> [(Peca, Coordenadas)] -> [(Peca, Coordenadas)]
-juntar l [] = []
+juntar l [] = l
 juntar [] l = l
 juntar ((p, (x,y)) : t) ((p2, (x2,y2)) : t2) | (x,y) == (x2,y2) = (p, (x,y)) : juntar (ordPecasy (ordPecasx t)) t2
                                              | otherwise = (p2, (x2,y2)) : juntar (ordPecasy (ordPecasx ((p, (x,y)) : t))) t2
