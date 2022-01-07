@@ -19,7 +19,6 @@ import Tarefa2_2021li1g006
 -- |Por exemplo:
 
 -- |moveJogador m1e1 AndarEsquerda = Jogo m1r (Jogador (5, 3) Oeste False)
-
 moveJogador :: Jogo -> Movimento -> Jogo
 moveJogador (Jogo m j) AndarDireita = Jogo m (andaDirJogador j m)
 moveJogador (Jogo m j) AndarEsquerda = Jogo m (andaEsqJogador j m)
@@ -31,7 +30,6 @@ moveJogador j InterageCaixa = interageCaixa j
 -- |Por exemplo:
 
 -- |correrMovimentos m1e1 [AndarEsquerda, Trepar, AndarEsquerda, AndarEsquerda] = m1e2
-
 correrMovimentos :: Jogo -> [Movimento] -> Jogo
 correrMovimentos jogo [] = jogo
 correrMovimentos jogo (h:t) = correrMovimentos (moveJogador jogo h) t
@@ -44,7 +42,6 @@ correrMovimentos jogo (h:t) = correrMovimentos (moveJogador jogo h) t
 -- |trepa (Jogador (3, 3) Este False) m1r = (Jogador (4, 2) Este False) 
 
 -- |trepa (Jogador (2, 3) Este False) m1r = (Jogador (2, 3) Este False)
-
 trepa :: Jogador -> Mapa -> Jogador
 trepa j@(Jogador (x,y) dir caixa) m
                      | not caixa && dir == Este && (getPeca m (x+1) y == Bloco || getPeca m (x+1) y == Caixa) && (getPeca m (x+1) (y-1) == Vazio || getPeca m (x+1) (y-1) == Porta) = Jogador (x+1,y-1) dir caixa
@@ -62,7 +59,6 @@ trepa j@(Jogador (x,y) dir caixa) m
 -- |andaDirJogador (Jogador (2, 3) Oeste False) m1r = (Jogador (3, 3) Oeste False)
 
 -- |andaDirJogador (Jogador (6, 0) Oeste False) m1r = (Jogador (6, 0) Este False) (pois está no limite do mapa)
-
 andaDirJogador :: Jogador -> Mapa -> Jogador
 andaDirJogador (Jogador (x,y) dir caixa) m
              | x == length (head m) = Jogador (x,y) dir caixa
@@ -79,7 +75,6 @@ andaDirJogador (Jogador (x,y) dir caixa) m
 -- |andaEsqJogador (Jogador (2, 3) Oeste False) m1r = (Jogador (1, 3) Oeste False)
 
 -- |andaEsqJogador (Jogador (5, 3) Este False) m1r = (Jogador (5, 3) Oeste False)  (pois existe um obstáculo)
-
 andaEsqJogador :: Jogador -> Mapa -> Jogador
 andaEsqJogador (Jogador (x,y) dir caixa) m
              | x == 0 = Jogador (x,y) dir caixa
@@ -99,7 +94,6 @@ andaEsqJogador (Jogador (x,y) dir caixa) m
 -- |interageCaixa  (Jogador (2, 3) Este False) m1r =  (Jogador (2, 3) Este False) m1r (pois não existe caixa para apanhar ou largar)
 
 -- |interageCaixa  (Jogador (3, 3) Este True) m1r = (Jogador (3, 3) Este False) m1r (pousou uma caixa)
-
 interageCaixa :: Jogo -> Jogo
 interageCaixa jog@(Jogo m j@(Jogador (x,y) dir caixa)) 
                                                        | caixa && dir == Este && getPeca m (x+1) (y-1) == Vazio && (getPeca m (x+1) y == Bloco || getPeca m (x+1) y == Caixa) && getPeca m x (y-1) == Vazio
@@ -116,10 +110,12 @@ interageCaixa jog@(Jogo m j@(Jogador (x,y) dir caixa))
                                                        | not caixa && dir == Oeste && getPeca m (x-1) y == Caixa && getPeca m x (y-1) == Vazio && getPeca m (x-1) (y-1) == Vazio = Jogo (setPeca m Vazio (x-1) y) (Jogador (x,y) dir True)
                                                        | otherwise = jog
 
+-- | Dado um mapa e um inteiro (coordenada x), calcula a lista das coordenadas y's correspondentes a esse x.
 listaColuna :: [(Peca,Coordenadas)] -> Int -> [Int]
 listaColuna [] _ = []
 listaColuna ((p,(x,y)):t) a = if a == x then y : listaColuna t a else listaColuna t a
 
+-- | Juntamente com a função listaColuna, calcula o y mais acima, tendo também de ser abaixo do y dado.
 findChao :: Int -> Int -> Mapa -> Int
 findChao x y m = minimum $ filter (> y) (listaColuna (desconstroiMapa m) x)
 
@@ -129,7 +125,6 @@ findChao x y m = minimum $ filter (> y) (listaColuna (desconstroiMapa m) x)
 -- |Por exemplo:
 
 -- |getPeca m1r 0 3 = Porta
-
 getPeca :: Mapa -> Int -> Int -> Peca
 getPeca [] _ _ = Vazio
 getPeca (h:t) x 0 = getLinha h x
@@ -140,7 +135,6 @@ getPeca (h:t) x y = getPeca t x (y-1)
 -- |Por exemplo:
 
 -- |getLinha [Bloco,Bloco,Porta] 3 = Porta   
-
 getLinha :: [Peca] -> Int -> Peca
 getLinha [] _ = Vazio
 getLinha (h:t) 0 = h
@@ -153,7 +147,6 @@ getLinha (h:t) x = getLinha t (x-1)
 -- |setPeca [[Vazio,Vazio,Vazio,Bloco],[Vazio,Vazio,Caixa,Bloco],[Bloco,Bloco,Bloco,Bloco]] Vazio 2 1 = [[Vazio,Vazio,Vazio,Bloco],[Vazio,Vazio,Vazio,Bloco],[Bloco,Bloco,Bloco,Bloco]]   
 
 -- |setPeca [[Vazio,Vazio,Vazio,Bloco],[Vazio,Vazio,Caixa,Bloco],[Bloco,Bloco,Bloco,Bloco]] Vazio 0 2 = [[Vazio,Vazio,Vazio,Bloco],[Vazio,Vazio,Caixa,Bloco],[Vazio,Bloco,Bloco,Bloco]]   
-
 setPeca :: Mapa -> Peca -> Int -> Int -> Mapa
 setPeca [] _ _ _ = []
 setPeca (h:t) p x 0 = setLinha h p x : t
@@ -164,7 +157,6 @@ setPeca (h:t) p x y = h : setPeca t p x (y-1)
 -- |Por exemplo:
 
 -- |setLinha [Vazio,Vazio,Caixa,Bloco] Vazio 2 = [Vazio,Vazio,Vazio,Bloco]    
-
 setLinha :: [Peca] -> Peca -> Int -> [Peca]
 setLinha [] _ _ = []
 setLinha (h:t) p 0 = p:t
