@@ -87,6 +87,7 @@ esvaziarateaux (p,(x,y)) = if x >= 0 then (Vazio,(x,y)) : esvaziarateaux (Vazio,
 
 -- |juntar [(Bloco,(1,1)),(Bloco,(3,2))] (crescente [(Bloco,(1,1)),(Bloco,(3,2))]) = [(Vazio,(0,0)),(Vazio,(1,0)),(Vazio,(2,0)),(Vazio,(3,0)),(Vazio,(0,1)),(Bloco,(1,1)),(Vazio,(2,1)),(Vazio,(3,1)),(Vazio,(0,2)),(Vazio,(1,2)),(Vazio,(2,2)),(Bloco,(3,2))]
 juntar :: [(Peca, Coordenadas)] -> [(Peca, Coordenadas)] -> [(Peca, Coordenadas)]
+juntar l [] = []
 juntar [] l = l
 juntar ((p, (x,y)) : t) ((p2, (x2,y2)) : t2) | (x,y) == (x2,y2) = (p, (x,y)) : juntar (ordPecasy (ordPecasx t)) t2
                                              | otherwise = (p2, (x2,y2)) : juntar (ordPecasy (ordPecasx ((p, (x,y)) : t))) t2
@@ -171,7 +172,7 @@ desconstroiLista a b (h:t) = tirarVazios ((h,(a,b)) : desconstroiLista (a+1) b t
 -- |constroiMapa [(Bloco,(1,2)),(Bloco,(2,3)),(Bloco,(3,3))] = [[Vazio,Vazio,Vazio,Vazio],[Vazio,Vazio,Vazio,Vazio],[Vazio,Bloco,Vazio,Vazio],[Vazio,Vazio,Bloco,Bloco]]
 constroiMapa :: [(Peca, Coordenadas)] -> Mapa
 constroiMapa [] = []
-constroiMapa ((p,(x,y)):t) = if validaPotencialMapa ((p,(x,y)):t) then separaListas (listavazios ((p,(x,y)):t)) 0 else []
+constroiMapa ((p,(x,y)):t) = separaListas (listavazios ((p,(x,y)):t)) 0
 
 -- |Finalmente, também, a função desconstroiMapa, que faz o contrário da constroiMapa (origina uma lista de (Peca, Coordenadas) a partir de um mapa.)
 
