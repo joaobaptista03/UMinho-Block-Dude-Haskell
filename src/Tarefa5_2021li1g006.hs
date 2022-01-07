@@ -151,6 +151,7 @@ paraGloss block box door1 door2 ((p, (x,y)):t) (GameMode (Jogo m (Jogador (_,_) 
 jogoinicial :: Float -> Int -> Status 
 jogoinicial t l | l == 1 = GameMode (Jogo mapa1 (Jogador (1,9) Este False)) 0 1
                 | l == 2 = GameMode (Jogo mapa2 (Jogador (1,9) Este False)) t 2
+                | l == 3 = GameMode (Jogo mapa3 (Jogador (1,2) Este False)) t 3
                 | otherwise = undefined
 
 
@@ -191,6 +192,22 @@ mapa2 =         [
                 , [Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco]
                                                                                                                                               ]
 
+-- | Terceiro mapa do jogo.
+mapa3 :: Mapa
+mapa3 =         [
+                  [Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco]
+                , [Bloco, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Bloco]
+                , [Bloco, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Bloco]
+                , [Bloco, Bloco, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Bloco]
+                , [Bloco, Bloco, Bloco, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Bloco]
+                , [Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Bloco]
+                , [Bloco, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Bloco, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Bloco]
+                , [Bloco, Caixa, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Bloco, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Bloco]
+                , [Bloco, Caixa, Caixa, Vazio, Vazio, Vazio, Vazio, Vazio, Bloco, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Bloco]
+                , [Bloco, Caixa, Caixa, Caixa, Caixa, Vazio, Vazio, Vazio, Bloco, Vazio, Vazio, Vazio, Vazio, Vazio, Vazio, Bloco, Vazio, Porta]
+                , [Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco, Bloco]
+                                                                                                                                              ]
+
 -- | A função event transforma cada de input do Jogador na sua respetiva ação/movimento.
 
 -- | Por exemplo:
@@ -209,19 +226,19 @@ event (EventKey (SpecialKey KeyDown) Down _ _) (Controller Instructions) = Contr
 event (EventKey (SpecialKey KeyEnter) Down _ _) Instructionss = Controller Play
 event (EventKey (SpecialKey KeyEnter) Down _ _) (Controller Exit) = undefined
 event (EventKey (SpecialKey KeyEnter) Down _ _) (Win a) = Controller Play
-event (EventKey (SpecialKey KeyUp) Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n l) | snd (saberPorta (desconstroiMapa m)) == (cordx (Jogo m (trepa (Jogador (x,y) d c) m)),cordy (Jogo m (andaEsqJogador (Jogador (x,y) d c) m))) = if l == 2 then Win (round(n)) else jogoinicial n (l+1)
+event (EventKey (SpecialKey KeyUp) Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n l) | snd (saberPorta (desconstroiMapa m)) == (cordx (Jogo m (trepa (Jogador (x,y) d c) m)),cordy (Jogo m (andaEsqJogador (Jogador (x,y) d c) m))) = if l == 3 then Win (round(n)) else jogoinicial n (l+1)
                                                                                          | otherwise = GameMode (Jogo m (trepa (Jogador (x,y) d c) m)) n l
 event (EventKey (SpecialKey KeyDown) Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n l) = GameMode (interageCaixa (Jogo m (Jogador (x,y) d c))) n l
-event (EventKey (SpecialKey KeyLeft) Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n l) | snd (saberPorta (desconstroiMapa m)) == (cordx (Jogo m (andaEsqJogador (Jogador (x,y) d c) m)),cordy (Jogo m (andaEsqJogador (Jogador (x,y) d c) m))) = if l == 2 then Win (round(n)) else jogoinicial n (l+1)
+event (EventKey (SpecialKey KeyLeft) Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n l) | snd (saberPorta (desconstroiMapa m)) == (cordx (Jogo m (andaEsqJogador (Jogador (x,y) d c) m)),cordy (Jogo m (andaEsqJogador (Jogador (x,y) d c) m))) = if l == 3 then Win (round(n)) else jogoinicial n (l+1)
                                                                                            | otherwise = GameMode (Jogo m (andaEsqJogador (Jogador (x,y) d c) m)) n l
-event (EventKey (SpecialKey KeyRight) Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n l) | snd (saberPorta (desconstroiMapa m)) == (cordx (Jogo m (andaDirJogador (Jogador (x,y) d c) m)),cordy (Jogo m (andaDirJogador (Jogador (x,y) d c) m))) = if l == 2 then Win (round(n)) else jogoinicial n (l+1)
+event (EventKey (SpecialKey KeyRight) Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n l) | snd (saberPorta (desconstroiMapa m)) == (cordx (Jogo m (andaDirJogador (Jogador (x,y) d c) m)),cordy (Jogo m (andaDirJogador (Jogador (x,y) d c) m))) = if l == 3 then Win (round(n)) else jogoinicial n (l+1)
                                                                                             | otherwise = GameMode (Jogo m (andaDirJogador (Jogador (x,y) d c) m)) n l
 event (EventKey (Char 'w') Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n l) | snd (saberPorta (desconstroiMapa m)) == (cordx (Jogo m (trepa (Jogador (x,y) d c) m)),cordy (Jogo m (andaEsqJogador (Jogador (x,y) d c) m))) = if l == 2 then Win (round(n)) else jogoinicial n (l+1)
                                                                                  | otherwise = GameMode (Jogo m (trepa (Jogador (x,y) d c) m)) n l
 event (EventKey (Char 's') Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n l) = GameMode (interageCaixa (Jogo m (Jogador (x,y) d c))) n l
-event (EventKey (Char 'a') Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n l) | snd (saberPorta (desconstroiMapa m)) == (cordx (Jogo m (andaEsqJogador (Jogador (x,y) d c) m)),cordy (Jogo m (andaEsqJogador (Jogador (x,y) d c) m))) = if l == 2 then Win (round(n)) else jogoinicial n (l+1)
+event (EventKey (Char 'a') Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n l) | snd (saberPorta (desconstroiMapa m)) == (cordx (Jogo m (andaEsqJogador (Jogador (x,y) d c) m)),cordy (Jogo m (andaEsqJogador (Jogador (x,y) d c) m))) = if l == 3 then Win (round(n)) else jogoinicial n (l+1)
                                                                                  | otherwise = GameMode (Jogo m (andaEsqJogador (Jogador (x,y) d c) m)) n l
-event (EventKey (Char 'd') Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n l) | snd (saberPorta (desconstroiMapa m)) == (cordx (Jogo m (andaDirJogador (Jogador (x,y) d c) m)),cordy (Jogo m (andaDirJogador (Jogador (x,y) d c) m))) = if l == 2 then Win (round(n)) else jogoinicial n (l+1)
+event (EventKey (Char 'd') Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n l) | snd (saberPorta (desconstroiMapa m)) == (cordx (Jogo m (andaDirJogador (Jogador (x,y) d c) m)),cordy (Jogo m (andaDirJogador (Jogador (x,y) d c) m))) = if l == 3 then Win (round(n)) else jogoinicial n (l+1)
                                                                                  | otherwise = GameMode (Jogo m (andaDirJogador (Jogador (x,y) d c) m)) n l
 event _ w = w
 
