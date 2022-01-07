@@ -12,6 +12,7 @@ import LI12122
 import GHC.Stack.Types (CallStack(FreezeCallStack))
 import Language.Haskell.TH (javaScript)
 import Tarefa1_2021li1g006
+import Tarefa2_2021li1g006
 
 -- |Aplica o efeito de um comando sobre o jogador.
 
@@ -109,9 +110,18 @@ interageCaixa jog@(Jogo m j@(Jogador (x,y) dir caixa))
                                                         = Jogo (setPeca m Caixa (x+1) y) (Jogador (x,y) dir False)
                                                        | caixa && dir == Oeste && getPeca m (x-1) (y-1) == Vazio && getPeca m x (y-1) == Vazio && getPeca m (x-1) y == Vazio && (getPeca m (x-1) (y+1) == Bloco || getPeca m (x-1) (y+1) == Caixa)
                                                         = Jogo (setPeca m Caixa (x-1) y) (Jogador (x,y) dir False)
+                                                       | caixa && dir == Oeste && getPeca m (x-1) (y-1) == Vazio && getPeca m x (y-1) == Vazio && getPeca m (x-1) y == Vazio = Jogo (setPeca m Caixa (x-1) ((findChao (x-1) y m) - 1)) (Jogador (x,y) dir False)
+                                                       | caixa && dir == Este && getPeca m (x+1) (y-1) == Vazio && getPeca m x (y-1) == Vazio && getPeca m (x+1) y == Vazio = Jogo (setPeca m Caixa (x+1) ((findChao (x+1) y m) - 1)) (Jogador (x,y) dir False) 
                                                        | not caixa && dir == Este && getPeca m (x+1) y == Caixa && getPeca m x (y-1) == Vazio && getPeca m (x+1) (y-1) == Vazio = Jogo (setPeca m Vazio (x+1) y) (Jogador (x,y) dir True)
                                                        | not caixa && dir == Oeste && getPeca m (x-1) y == Caixa && getPeca m x (y-1) == Vazio && getPeca m (x-1) (y-1) == Vazio = Jogo (setPeca m Vazio (x-1) y) (Jogador (x,y) dir True)
                                                        | otherwise = jog
+
+listaColuna :: [(Peca,Coordenadas)] -> Int -> [Int]
+listaColuna [] _ = []
+listaColuna ((p,(x,y)):t) a = if a == x then y : listaColuna t a else listaColuna t a
+
+findChao :: Int -> Int -> Mapa -> Int
+findChao x y m = minimum $ filter (> y) (listaColuna (desconstroiMapa m) x)
 
 
 -- |A função getPeca devolve o tipo de peca duma dada posicao no mapa.
