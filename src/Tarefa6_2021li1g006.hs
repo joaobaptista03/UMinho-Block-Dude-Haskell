@@ -17,7 +17,6 @@ import Tarefa5_2021li1g006
 import Data.Maybe
 
 import LI12122
-import qualified Data.Functor as Nothing
 
 
 auxauxRS :: Jogo -> ([Maybe Movimento],Int)
