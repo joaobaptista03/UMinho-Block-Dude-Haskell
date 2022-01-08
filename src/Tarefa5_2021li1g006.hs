@@ -149,10 +149,10 @@ paraGloss block box door1 door2 ((p, (x,y)):t) (GameMode (Jogo m (Jogador (_,_) 
       j = (-64) * fromIntegral y
 
 -- | Ponto de partida do jogo, que inclui o mapa1, mapa2 e o tempo de jogo decorrido consoante as variáveis inseridas.
-jogoinicial :: Float -> Int -> Float -> Status 
-jogoinicial t l a | l == 1 = GameMode (Jogo mapa1 (Jogador (1,9) Este False)) 0 1 a
-                  | l == 2 = GameMode (Jogo mapa2 (Jogador (1,9) Este False)) t 2 a
-                  | l == 3 = GameMode (Jogo mapa3 (Jogador (1,2) Este False)) t 3 a
+jogoinicial :: Float -> Int -> Float -> IO Status 
+jogoinicial t l a | l == 1 = return $ GameMode (Jogo mapa1 (Jogador (1,9) Este False)) 0 1 a
+                  | l == 2 = return $ GameMode (Jogo mapa2 (Jogador (1,9) Este False)) t 2 a
+                  | l == 3 = return $ GameMode (Jogo mapa3 (Jogador (1,2) Este False)) t 3 a
                   | otherwise = undefined
 
 
@@ -215,8 +215,8 @@ mapa3 =         [
 
 -- | Se o jogador clicar no "a" ou no "d", anda, respetivamente, para a esquerda ou direita.
 event :: Event -> Status -> IO Status
-event (EventKey (SpecialKey KeyEnter) Down _ _) (Controller Play a) = return $ jogoinicial 0 1 a
-event (EventKey (Char 'r') Down _ _) (GameMode _ _ l a) = return $ jogoinicial 0 1 a
+event (EventKey (SpecialKey KeyEnter) Down _ _) (Controller Play a) = jogoinicial 0 1 a
+event (EventKey (Char 'r') Down _ _) (GameMode _ _ l a) = jogoinicial 0 1 a
 event (EventKey (Char 'm') Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n l a) = return (Controller Play a)
 event (EventKey (Char 'm') Down _ _) (Controller Play a) = return (Controller Play a)
 event (EventKey (Char 'm') Down _ _) (Controller Instructions a) = return (Controller Play a)
@@ -233,29 +233,29 @@ event (EventKey (SpecialKey KeyEsc) Down _ _) _ = exitSuccess
 event (EventKey (SpecialKey KeyEnter) Down _ _) (Win a b) = return $ Controller Play b
 event (EventKey (SpecialKey KeyUp) Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n l a) | snd (saberPorta (desconstroiMapa m)) == (cordx (Jogo m (trepa (Jogador (x,y) d c) m)),cordy (Jogo m (andaEsqJogador (Jogador (x,y) d c) m))) = if l == 3 then do appendFile "Wins.txt" ("\n" ++ "You took " ++ show n ++ " Seconds!")
                                                                                                                                                                                                                                                               return $ Win (round(n)) a
-                                                                                                                                                                                                                                                      else return $ jogoinicial n (l+1) a
+                                                                                                                                                                                                                                                      else jogoinicial n (l+1) a
                                                                                            | otherwise = return $ GameMode (Jogo m (trepa (Jogador (x,y) d c) m)) n l a
 event (EventKey (SpecialKey KeyDown) Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n l a) = return $ GameMode (interageCaixa (Jogo m (Jogador (x,y) d c))) n l a
 event (EventKey (SpecialKey KeyLeft) Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n l a) | snd (saberPorta (desconstroiMapa m)) == (cordx (Jogo m (andaEsqJogador (Jogador (x,y) d c) m)),cordy (Jogo m (andaEsqJogador (Jogador (x,y) d c) m))) = if l == 3 then do appendFile "Wins.txt" ("\n" ++ "You took " ++ show n ++ " Seconds!")
                                                                                                                                                                                                                                                                          return $ Win (round(n)) a
-                                                                                                                                                                                                                                                                  else return $ jogoinicial n (l+1) a
+                                                                                                                                                                                                                                                                  else jogoinicial n (l+1) a
                                                                                              | otherwise = return $ GameMode (Jogo m (andaEsqJogador (Jogador (x,y) d c) m)) n l a
 event (EventKey (SpecialKey KeyRight) Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n l a) | snd (saberPorta (desconstroiMapa m)) == (cordx (Jogo m (andaDirJogador (Jogador (x,y) d c) m)),cordy (Jogo m (andaDirJogador (Jogador (x,y) d c) m))) = if l == 3 then do appendFile "Wins.txt" ("\n" ++ "You took " ++ show n ++ " Seconds!")
                                                                                                                                                                                                                                                                           return $ Win (round(n)) a
-                                                                                                                                                                                                                                                                  else return $ jogoinicial n (l+1) a
+                                                                                                                                                                                                                                                                  else jogoinicial n (l+1) a
                                                                                               | otherwise = return $ GameMode (Jogo m (andaDirJogador (Jogador (x,y) d c) m)) n l a
 event (EventKey (Char 'w') Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n l a) | snd (saberPorta (desconstroiMapa m)) == (cordx (Jogo m (trepa (Jogador (x,y) d c) m)),cordy (Jogo m (andaEsqJogador (Jogador (x,y) d c) m))) = if l == 3 then do appendFile "Wins.txt" ("\n" ++ "You took " ++ show n ++ " Seconds!")
                                                                                                                                                                                                                                                       return $ Win (round(n)) a
-                                                                                                                                                                                                                                              else return $ jogoinicial n (l+1) a
+                                                                                                                                                                                                                                              else jogoinicial n (l+1) a
                                                                                    | otherwise = return $ GameMode (Jogo m (trepa (Jogador (x,y) d c) m)) n l a
 event (EventKey (Char 's') Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n l a) = return $ GameMode (interageCaixa (Jogo m (Jogador (x,y) d c))) n l a
 event (EventKey (Char 'a') Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n l a) | snd (saberPorta (desconstroiMapa m)) == (cordx (Jogo m (andaEsqJogador (Jogador (x,y) d c) m)),cordy (Jogo m (andaEsqJogador (Jogador (x,y) d c) m))) = if l == 3 then do appendFile "Wins.txt" ("\n" ++ "You took " ++ show n ++ " Seconds!")
                                                                                                                                                                                                                                                                return $ Win (round(n)) a
-                                                                                                                                                                                                                                                        else return $ jogoinicial n (l+1) a
+                                                                                                                                                                                                                                                        else jogoinicial n (l+1) a
                                                                                    | otherwise = return $ GameMode (Jogo m (andaEsqJogador (Jogador (x,y) d c) m)) n l a
 event (EventKey (Char 'd') Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n l a) | snd (saberPorta (desconstroiMapa m)) == (cordx (Jogo m (andaDirJogador (Jogador (x,y) d c) m)),cordy (Jogo m (andaDirJogador (Jogador (x,y) d c) m))) = if l == 3 then do appendFile "Wins.txt" ("\n" ++ "You took " ++ show n ++ " Seconds!")
                                                                                                                                                                                                                                                                return $ Win (round(n)) a
-                                                                                                                                                                                                                                                       else return $ jogoinicial n (l+1) a
+                                                                                                                                                                                                                                                       else jogoinicial n (l+1) a
                                                                                    | otherwise = return $ GameMode (Jogo m (andaDirJogador (Jogador (x,y) d c) m)) n l a
 event (EventKey (Char '-') Down _ _) (GameMode (Jogo m (Jogador (x,y) d c)) n l a) = return (GameMode (Jogo m (Jogador (x,y) d c)) n l (a-0.05))
 event (EventKey (Char '-') Down _ _) (Controller Play a) = return (Controller Play (a-0.05))
